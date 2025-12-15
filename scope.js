@@ -1,79 +1,155 @@
-// var vs let vs const
+/*
+============================================================
+ var vs let vs const — THEORY + EXAMPLES (Interview Ready)
+============================================================
 
-// scopes - var is __ scoped
+Quick Summary:
+- var   -> function scoped, hoisted with `undefined`, allows redeclaration
+- let   -> block scoped, hoisted but in Temporal Dead Zone (TDZ)
+- const -> block scoped, hoisted but in TDZ, must be initialized, no reassignment
+
+Use this file to revise before interviews.
+*/
+
+// -----------------------------------------------------------
+// 1) SCOPE
+// -----------------------------------------------------------
+
+// THEORY:
+// - var is FUNCTION scoped (ignores block {})
+// - let & const are BLOCK scoped (respect {})
+
 {
-  var a = 5;
+  var a = 5; // var ignores block scope
 }
 
-console.log(a);
+console.log(a); // 5 (accessible outside block)
 
-// {
-//   let b = 5;
-// }
+{
+  let b = 5; // block scoped
+}
+// console.log(b); // ReferenceError: b is not defined
 
-// console.log(b);
+{
+  const c = 5; // block scoped
+}
+// console.log(c); // ReferenceError: c is not defined
 
-// {
-//   const c = 5;
-// }
+// -----------------------------------------------------------
+// 2) VARIABLE SHADOWING
+// -----------------------------------------------------------
 
-// console.log(c);
+// THEORY:
+// Shadowing happens when an inner scope variable has the same
+// name as an outer scope variable. This is allowed with let/const.
 
-// variable shadowing
-function test() {
-  let a = "Hello";
+function shadowingExample() {
+  let msg = "Hello";
 
   if (true) {
-    let a = "hi";
-    console.log(a);
+    let msg = "Hi"; // shadows outer msg
+    console.log(msg); // Hi
   }
-  console.log(a);
+
+  console.log(msg); // Hello
 }
 
-test();
+shadowingExample();
 
-// illegal shadowing
-function test() {
-  var a = "Hello";
-  let b = "Bye";
+// -----------------------------------------------------------
+// 3) ILLEGAL SHADOWING
+// -----------------------------------------------------------
+
+// THEORY:
+// - var cannot shadow a let/const variable in the same or inner scope
+// - let can shadow var (allowed)
+
+function illegalShadowingExample() {
+  var x = "Hello";
+  let y = "Bye";
 
   if (true) {
-    let a = "hi";
-    // var b = "Goodbye";
-    console.log(a);
-    console.log(b);
+    let x = "Hi"; // allowed: let shadows var
+    // var y = "Goodbye"; // ❌ Illegal shadowing (uncomment to see error)
+
+    console.log(x); // Hi
+    console.log(y); // Bye
   }
 }
 
-test();
+illegalShadowingExample();
 
-// Declaration
-var a;
-var a; // No error
+// -----------------------------------------------------------
+// 4) DECLARATION RULES
+// -----------------------------------------------------------
 
-// let a;
-// let a; // Re-declaration error
+// THEORY:
+// - var allows redeclaration
+// - let & const do NOT allow redeclaration
 
-// const a ;
-// const a ; // Re-declaration error and initialization error
+var d;
+var d; // ✅ No error
 
-// Re-Initialization
-var a = 1;
-a = 1;
+// let e;
+// let e; // ❌ SyntaxError: Identifier 'e' has already been declared
 
-let b = 2;
-b = 2;
+// const f;
+// const f; // ❌ SyntaxError + const must be initialized
 
-const c = 3;
-// c = 4; //TypeError: Assignment to constant variable.
+// -----------------------------------------------------------
+// 5) INITIALIZATION & REASSIGNMENT
+// -----------------------------------------------------------
 
-// Hoisting
-console.log(count); // undefined - var is hoisted
+// THEORY:
+// - var & let can be reassigned
+// - const cannot be reassigned
+
+var g = 1;
+g = 2; // ✅ allowed
+
+let h = 3;
+h = 4; // ✅ allowed
+
+const i = 5;
+// i = 6; // ❌ TypeError: Assignment to constant variable
+
+// IMPORTANT:
+// const prevents reassignment, NOT mutation
+
+const user = { name: "Izhar" };
+user.name = "Mohammed"; // ✅ allowed (object mutation)
+console.log(user);
+
+// -----------------------------------------------------------
+// 6) HOISTING
+// -----------------------------------------------------------
+
+// THEORY:
+// - var is hoisted and initialized with `undefined`
+// - let & const are hoisted but stay in Temporal Dead Zone (TDZ)
+
+// --- var hoisting ---
+console.log(count); // undefined
 var count = 10;
 
-console.log(count1); // let and const are also hoisted but temporal dead zone
-console.log(count2);
-// ReferenceError: Cannot access 'count1' before initialization
+// Internally JS does:
+// var count;
+// console.log(count);
+// count = 10;
+
+// --- let & const hoisting (TDZ) ---
+// console.log(count1); // ❌ ReferenceError (TDZ)
+// console.log(count2); // ❌ ReferenceError (TDZ)
 
 let count1 = 10;
 const count2 = 20;
+
+// -----------------------------------------------------------
+// INTERVIEW ONE-LINER (MEMORIZE)
+// -----------------------------------------------------------
+
+/*
+var is function scoped, hoisted with undefined and allows redeclaration.
+let and const are block scoped, hoisted but in temporal dead zone.
+const cannot be reassigned.
+*/
