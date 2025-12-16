@@ -1,53 +1,123 @@
-//  what is function expression ?
-// what is anonymous functions anf it can be used as callback and also can be stored in variable
-// const square = function (num) {
-//   return num * num;
-// };
+/*
+============================================================
+ JAVASCRIPT FUNCTIONS — THEORY + OUTPUT BASED QUESTIONS
+============================================================
 
-// square();
+Covers:
+- Function Expression
+- Anonymous Function
+- First Class Functions
+- IIFE
+- Scope + setTimeout
+- Function Hoisting
+- Params vs Arguments
+- Spread vs Rest
+- Callback Functions
+- Arrow Functions vs Regular Functions
 
-//  what are first class functions
+This file is INTERVIEW READY.
+*/
+
+// -----------------------------------------------------------
+// 1) FUNCTION EXPRESSION
+// -----------------------------------------------------------
+
+// THEORY:
+// A function expression is when a function is assigned to a variable.
+// It is NOT hoisted.
+
+const squareExpr = function (num) {
+  return num * num;
+};
+
+console.log("Function Expression:", squareExpr(4)); // 16
+
+// -----------------------------------------------------------
+// 2) ANONYMOUS FUNCTION
+// -----------------------------------------------------------
+
+// THEORY:
+// A function without a name is called an anonymous function.
+// It can be:
+// - Stored in a variable
+// - Passed as a callback
+
+setTimeout(function () {
+  console.log("Anonymous function as callback");
+}, 500);
+
+// -----------------------------------------------------------
+// 3) FIRST CLASS FUNCTIONS
+// -----------------------------------------------------------
+
+// THEORY:
+// In JS, functions are treated like variables.
+// They can be passed as arguments, returned from functions,
+// and stored in variables.
+
 function square(num) {
   return num * num;
 }
 
 function displaySquare(fn) {
-  console.log("Square is:-", fn(5));
+  console.log("Square is:", fn(5));
 }
 
 displaySquare(square);
 
-//  what is IIFE
+// -----------------------------------------------------------
+// 4) IIFE (Immediately Invoked Function Expression)
+// -----------------------------------------------------------
 
-(function square(num) {
-  console.log(num * num);
+// THEORY:
+// IIFE runs immediately after creation.
+// Used to avoid polluting global scope.
+
+(function squareIIFE(num) {
+  console.log("IIFE output:", num * num);
 })(5);
 
-// IIFE - o/p based question
+// IIFE — Output based question
 (function (x) {
   return (function (y) {
-    console.log(x); // 1
+    console.log("IIFE closure output:", x); // 1
   })(2);
 })(1);
 
-// Function scope - o/p based question
-// for (let i = 0; i < 5; i++) {
-//   setTimeout(function () {
-//     console.log(i);
-//   }, i * 1000);
-// }
-// //  1,2,3,4,5
-// for (var i = 0; i < 5; i++) {
-//   setTimeout(function () {
-//     console.log(i);
-//   }, i * 1000);
-// }
-//  5,5,5,5,5
+// -----------------------------------------------------------
+// 5) FUNCTION SCOPE + setTimeout (VERY IMPORTANT)
+// -----------------------------------------------------------
 
-// Function Hoisting
+// THEORY:
+// let -> block scoped
+// var -> function scoped
+
+// Using let
+for (let i = 0; i < 5; i++) {
+  setTimeout(function () {
+    console.log("let:", i);
+  }, i * 1000);
+}
+// Output: 0 1 2 3 4
+
+// Using var
+for (var j = 0; j < 5; j++) {
+  setTimeout(function () {
+    console.log("var:", j);
+  }, j * 1000);
+}
+// Output: 5 5 5 5 5
+
+// -----------------------------------------------------------
+// 6) FUNCTION HOISTING
+// -----------------------------------------------------------
+
+// THEORY:
+// Function declarations are hoisted completely.
+// Function expressions are NOT hoisted.
 
 functionName();
-console.log(x);
+console.log(x); // undefined
 
 function functionName() {
   console.log("Izhar");
@@ -56,71 +126,110 @@ function functionName() {
 var x = 21;
 
 var fun = function () {
-  console.log(x); // undefined: bcoz firsty it will take 21 because it is global scope but when it comes inside function then it will hoist the local variable x so after hoisting x becomes undefined
+  console.log(x); // undefined (local x is hoisted)
   var x = 20;
 };
 
 fun();
 
-//  Params vs arguments
-function square(num) {
-  // Params
-  console.log(num * num);
+// -----------------------------------------------------------
+// 7) PARAMETERS vs ARGUMENTS
+// -----------------------------------------------------------
+
+// THEORY:
+// Parameters -> variables defined in function definition
+// Arguments  -> actual values passed to function
+
+function squareParam(num) {
+  console.log("Params vs Arguments:", num * num);
 }
 
-square(5); // Arguments
+squareParam(5); // 5 is argument
 
-//  spread vs rest
+// -----------------------------------------------------------
+// 8) SPREAD vs REST OPERATOR
+// -----------------------------------------------------------
+
+// REST: collects values into array
 function multiply(...nums) {
-  // Rest if we use ... here
-  console.log(nums);
+  console.log("Rest operator:", nums);
 }
-var arr = [5, 6];
-multiply(...arr); // spread if we use ... here
 
-//  Callback function
-// setTimeOut, map, filter, reduce are js cb functions
+const arr = [5, 6];
 
-// Arrow functions
-const add = (a, b) => {
+// SPREAD: expands array
+multiply(...arr);
+
+// -----------------------------------------------------------
+// 9) CALLBACK FUNCTIONS
+// -----------------------------------------------------------
+
+// THEORY:
+// A callback function is passed as an argument
+// and executed later.
+
+// Examples: setTimeout, map, filter, reduce
+
+[1, 2, 3].map(function (num) {
+  return num * 2;
+});
+
+// -----------------------------------------------------------
+// 10) ARROW FUNCTIONS
+// -----------------------------------------------------------
+
+// Regular function
+function add(a, b) {
   return a + b;
-};
+}
 
-// Arrow functions vs regular functions
-// 1- syntax
-function square(num) {
+// Arrow function
+const addArrow = (a, b) => a + b;
+
+console.log("Arrow function:", addArrow(2, 3));
+
+// -----------------------------------------------------------
+// ARROW vs REGULAR FUNCTIONS (IMPORTANT)
+// -----------------------------------------------------------
+
+// 1) Syntax
+function squareFn(num) {
   return num * num;
 }
 
-const square1 = (num) => {
-  return num * num;
-};
+const squareArrow = (num) => num * num;
 
-// 2- Implicit "return" keyword
-const squareArr = (num) => num * num;
-
-// 3- Arguments
-function fn() {
-  console.log("regular", arguments);
+// 2) Arguments object
+function regularFn() {
+  console.log("regular arguments:", arguments);
 }
 
-fn(1, 3, 2);
+regularFn(1, 2, 3);
 
-const fnArr = () => {
-  console.log("arrow", arguments);
+const arrowFn = () => {
+  // console.log(arguments); // ❌ arguments not available
 };
-fn(1, 3, 2);
 
-// 4- This keyword
+// 3) this keyword
 let user = {
   userName: "Izhar",
   rc1: () => {
-    console.log("Welcome", this.userName); // welcome undefined
+    console.log("Arrow this:", this.userName); // undefined
   },
   rc2() {
-    console.log("welcome", this.userName); // welcome izhar
+    console.log("Regular this:", this.userName); // Izhar
   },
 };
 
 user.rc1();
 user.rc2();
+
+// -----------------------------------------------------------
+// INTERVIEW ONE-LINERS (MEMORIZE)
+// -----------------------------------------------------------
+
+/*
+1) Functions are first-class citizens in JS.
+2) Arrow functions do not have their own this or arguments.
+3) IIFE is used to avoid global scope pollution.
+*/
