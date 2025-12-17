@@ -1,114 +1,141 @@
+/**
+ * --------------------------------------------------------------------------
+ *                              JAVASCRIPT OBJECTS
+ * --------------------------------------------------------------------------
+ * Theory:
+ * - Objects are non-primitive data types that allow you to store collections of data.
+ * - They are composed of key-value pairs (properties).
+ * - Keys are always strings (or Symbols), while values can be of any data type.
+ * - Objects are mutable and are passed by reference, not by value.
+ */
+
+// ==========================================
+// 1. CREATING OBJECTS
+// ==========================================
+
+// Method A: Object Literal (Most Common)
 const user = {
-  name: "izhar",
+  name: "Izhar",
   age: 21,
+  "is Admin": true, // Multi-word keys need quotes
 };
 
-console.log(user);
-delete user.age;
-console.log(user["name"]);
+// Method B: Object Constructor (Less Common)
+const obj = new Object();
+obj.id = 101;
 
-const property = "firstName";
-const name = "Mohammed Izhar";
+// ==========================================
+// 2. ACCESSING PROPERTIES
+// ==========================================
+
+// Dot Notation (Use when you know the key name)
+console.log(user.name); // "Izhar"
+
+// Bracket Notation (Use for dynamic keys or multi-word keys)
+console.log(user["age"]); // 21
+console.log(user["is Admin"]); // true
+
+// Dynamic Property Access
+const property = "name";
+console.log(user[property]); // "Izhar"
+
+// Computed Property Names
+const keyName = "firstName";
 const user1 = {
-  [property]: name,
-};
-console.log(user1);
-
-const user2 = {
-  name: "izhar",
-  age: 21,
-  isFinite: true,
+  [keyName]: "Mohammed Izhar", // Key becomes "firstName"
 };
 
-for (key in user2) {
-  console.log(`${key} : ${[key]}`);
+// ==========================================
+// 3. MODIFYING OBJECTS
+// ==========================================
+
+user.age = 22;       // Update
+user.city = "Dubai"; // Add
+delete user.age;     // Delete
+
+// ==========================================
+// 4. ITERATING OVER OBJECTS
+// ==========================================
+
+const person = { name: "Izhar", age: 21, role: "Dev" };
+
+// 'for...in' loop (Iterates over keys)
+for (let key in person) {
+  console.log(`${key}: ${person[key]}`);
 }
 
-const obj = {
-  a: "one",
-  b: "two",
-  a: "three",
-};
-console.log(obj); // { a: 'three', b: 'two' }
+// Object.keys(), Object.values(), Object.entries()
+console.log(Object.keys(person));   // ["name", "age", "role"]
+console.log(Object.values(person)); // ["Izhar", 21, "Dev"]
 
-// Q: create a  fn that multiplies all numeric property values of nums by 2
-let nums = {
-  a: 100,
-  b: 200,
-  title: "Izhar",
-};
+// Example: Function to multiply numeric properties by 2
+let nums = { a: 100, b: 200, title: "My Nums" };
 
-multiplyNum(nums);
-function multiplyNum(nums) {
-  for (let key in nums) {
-    if (typeof nums[key] === "number") {
-      nums[key] = nums[key] * 2;
+function multiplyNumeric(obj) {
+  for (let key in obj) {
+    if (typeof obj[key] === "number") {
+      obj[key] *= 2;
     }
   }
 }
+multiplyNumeric(nums);
+console.log(nums); // { a: 200, b: 400, title: "My Nums" }
 
-console.log(nums);
-
-// JSON.stringify and  JSON.parse
-const strObj = JSON.stringify(user2);
-console.log(strObj);
-console.log(JSON.parse(strObj));
-
-// spread operator
-console.log([..."izhar"]);
-
-const admin = { admin: true, ...user2 };
-console.log(admin);
+// ==========================================
+// 5. OBJECT METHODS & 'THIS' KEYWORD
+// ==========================================
 
 const shape = {
   radius: 10,
+  // Normal function: 'this' refers to the object calling the method
   diameter() {
     return this.radius * 2;
   },
+  // Arrow function: 'this' refers to the outer scope (window/global), NOT the object
   perimeter: () => this.radius * 2,
 };
-console.log(shape.diameter()); //20 bcoz in normal function this refers to block scope radius
-console.log(shape.perimeter()); //NaN bcoz in arrow function this refers to global scope where there is no radius
 
-//  Destructuring
-let user3 = { name: "izhar", age: 21 };
-let { name: userName, age: userAge } = user3;
-console.log(userName, userAge);
+console.log(shape.diameter());  // 20
+console.log(shape.perimeter()); // NaN (this.radius is undefined in global scope)
 
-let user4 = {
-  name: "izhar",
-  age: 21,
-  fullName: {
-    firstName: "Mohammed",
-    lastName: "Izhar",
-  },
+// ==========================================
+// 6. DESTRUCTURING & SPREAD OPERATOR
+// ==========================================
+
+// Destructuring (Extracting values)
+const { name: userName, role } = person;
+console.log(userName, role); // "Izhar", "Dev"
+
+// Nested Destructuring
+const userProfile = {
+  id: 1,
+  info: { firstName: "Mohammed", lastName: "Izhar" }
 };
-let { age, fullName: { firstName, lastName } } = user4;
-console.log(age, firstName, lastName);
+const { info: { firstName } } = userProfile;
 
-//  we provide the refernce in objects not copy the object
-let c = { greeting: "Hello" };
-let d = c;
-d.greeting = "Hi izhar";
-console.log(c.greeting);
+// Spread Operator (Cloning & Merging)
+const admin = { admin: true, ...person }; // Merges person into admin
 
-console.log({ a: 1 } == { a: 1 }); // false
-// console.log({ a: 1 } === { a: 1 }); // false
+// ==========================================
+// 7. COPYING OBJECTS (Reference vs Value)
+// ==========================================
 
-// whats the shallow copy and Deep copy
-let user5 = { name: "izhar", age: 21 };
-const objClone = Object.assign({}, user5);
+// Reference Copy (Both variables point to same object)
+let a = { x: 1 };
+let b = a;
+b.x = 2;
+console.log(a.x); // 2 (Changed because 'b' is just a reference to 'a')
 
-objClone.name = "Mohammed Izhar";
-console.log(user5.name); // izhar
-console.log(objClone.name); // Mohammed Izhar
+// Shallow Copy (Top level is copied, nested objects are still references)
+const shallowClone = { ...person };
+const shallowClone2 = Object.assign({}, person);
 
-const objClone1 = JSON.parse(JSON.stringify(user5));
-objClone1.name = "Mohammed Izhar";
-console.log(user5.name); // izhar
-console.log(objClone1.name); // Mohammed Izhar
+// Deep Copy (Complete independent copy)
+const deepClone = JSON.parse(JSON.stringify(userProfile));
 
-const objClone2 = { ...user5 };
-objClone2.name = "Mohammed Izhar";
-console.log(user5.name); // izhar
-console.log(objClone2.name); // Mohammed Izhar
+// ==========================================
+// 8. USEFUL JSON METHODS
+// ==========================================
+
+const str = JSON.stringify(person); // Object to String
+const parsed = JSON.parse(str);     // String to Object
