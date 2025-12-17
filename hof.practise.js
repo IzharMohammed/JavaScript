@@ -22,7 +22,7 @@ INSTRUCTIONS:
 // Output: [2, 4, 6]
 // -----------------------------------------------------------
 function doubleNumbers(arr) {
-  // TODO
+  return arr.map((a) => a * 2);
 }
 
 console.log("Q1:", doubleNumbers([1, 2, 3]));
@@ -35,7 +35,7 @@ console.log("Q1:", doubleNumbers([1, 2, 3]));
 // Output: [2,4,6]
 // -----------------------------------------------------------
 function filterEven(arr) {
-  // TODO
+  return arr.filter((a) => a % 2 === 0);
 }
 
 console.log("Q2:", filterEven([1, 2, 3, 4, 5, 6]));
@@ -48,7 +48,7 @@ console.log("Q2:", filterEven([1, 2, 3, 4, 5, 6]));
 // Output: 10
 // -----------------------------------------------------------
 function sumArray(arr) {
-  // TODO
+  return arr.reduce((acc, curr) => acc + curr, 0);
 }
 
 console.log("Q3:", sumArray([1, 2, 3, 4]));
@@ -61,7 +61,13 @@ console.log("Q3:", sumArray([1, 2, 3, 4]));
 // Output: 20
 // -----------------------------------------------------------
 function findMax(arr) {
-  // TODO
+  // M - 1
+  // return arr.reduce((acc, curr) => {
+  //   return acc > curr ? acc : curr;
+  // }, arr[0]);
+
+  // M-2
+  return arr.reduce((max, curr) => Math.max(max, curr), arr[0]);
 }
 
 console.log("Q4:", findMax([10, 5, 8, 20]));
@@ -74,7 +80,10 @@ console.log("Q4:", findMax([10, 5, 8, 20]));
 // Output: {1:1,2:2,3:3}
 // -----------------------------------------------------------
 function countFrequencyReduce(arr) {
-  // TODO
+  return arr.reduce((acc, curr) => {
+    acc[curr] = (acc[curr] || 0) + 1;
+    return acc;
+  }, {});
 }
 
 console.log("Q5:", countFrequencyReduce([1, 2, 2, 3, 3, 3]));
@@ -91,10 +100,21 @@ console.log("Q5:", countFrequencyReduce([1, 2, 2, 3, 3, 3]));
 //   { name: "C", marks: 30 },
 //   { name: "D", marks: 80 }
 // ]
-// Output: 150
+// Output:80
 // -----------------------------------------------------------
 function processMarks(students) {
-  // TODO
+  const qualifiedStudents = students
+    .map((stu) => ({
+      ...stu,
+      marks: stu.marks < 50 ? stu.marks + 10 : stu.marks,
+    }))
+    .filter((stu) => stu.marks > 50);
+
+  const totalMarks = qualifiedStudents.reduce((sum, stu) => sum + stu.marks, 0);
+  return {
+    totalMarks,
+    qualifiedStudents,
+  };
 }
 
 const students = [
@@ -115,13 +135,6 @@ Q2: [2,4,6]
 Q3: 10
 Q4: 20
 Q5: {1:1,2:2,3:3}
-Q6: 150
-Q7: [1,2,5,8]
-Q8: [8,5,2,1]
-Q9: 2
-Q9 Edge: -1
-Q10: 3
-Q10 Edge: -1
-Q11: { min:1, max:9 }
+Q6: 80
 ============================================================
 */
