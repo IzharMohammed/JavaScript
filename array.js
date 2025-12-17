@@ -201,7 +201,21 @@ console.log("Q7:", moveZeros([0, 1, 0, 3, 12]));
 // Concepts: Traversal
 // -----------------------------------------------------------
 function secondLargest(arr) {
-  // TODO
+  if (arr.length < 2) return null;
+
+  let first = -Infinity;
+  let second = -Infinity;
+
+  for (let num of arr) {
+    if (num > first) {
+      second = first;
+      first = num;
+    } else if (num > second && num < first) {
+      second = num;
+    }
+  }
+
+  return second;
 }
 
 console.log("Q8:", secondLargest([10, 5, 8, 20]));
