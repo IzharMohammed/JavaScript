@@ -103,7 +103,40 @@ console.log("Q2 Edge:", findDuplicates([1, 2, 3]));
 // Output: [["eat","tea","ate"],["tan","nat"],["bat"]]
 // Edge case: single word
 // -----------------------------------------------------------
-function groupAnagrams(words) {}
+// M-1 Object version
+function groupAnagrams(words) {
+  // console.log(words);
+  const map = {};
+  for (let word of words) {
+    // 1. sort the letters
+    const key = word.split("").sort().join();
+
+    //   2. group by key
+    if (!map[key]) {
+      map[key] = [];
+    }
+
+    map[key].push(word);
+  }
+
+  return Object.values(map);
+}
+
+// M-2 Map version
+function groupAnagrams1(words) {
+  const map = new Map();
+  for (let word of words) {
+    const key = word.split("").sort().join();
+
+    if (!map.has(key)) {
+      map.set(key, []);
+    }
+
+    map.get(key).push(word);
+  }
+
+  return Array.from(map.values());
+}
 
 console.log("Q3:", groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"]));
 console.log("Q3 Edge:", groupAnagrams(["abc"]));
