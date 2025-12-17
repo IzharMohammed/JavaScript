@@ -197,8 +197,16 @@ console.log("-".repeat(30));
 // Output: "programming"
 // -----------------------------------------------------------
 function longestWord(sentence) {
-  // TODO: Write your logic here
-  return "";
+  const words = sentence.split(" ");
+  let longest = "";
+
+  for (let word of words) {
+    if (word.length > longest.length) {
+      longest = word;
+    }
+  }
+
+  return longest;
 }
 
 console.log("Q6 Output:", longestWord("I love JavaScript programming"));
