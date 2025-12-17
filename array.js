@@ -101,7 +101,29 @@ console.log("Q4:", missingNumber([1, 2, 4, 5], 5));
 // Concepts: Modulo, slicing
 // -----------------------------------------------------------
 function rotateArray(arr, k) {
+  const n = arr.length - 1;
+  k = k % n;
 
+  // Step 1: Reverse whole array
+  reverse(arr, 0, n);
+
+  // Step 2: Reverse first k elements
+  reverse(arr, 0, k - 1);
+
+  // Step 3: Reverse remaining elements
+  reverse(arr, k, n);
+
+  return arr;
+}
+
+function reverse(arr, start, end) {
+  while (start < end) {
+    let something = arr[start];
+    arr[start] = arr[end];
+    arr[end] = something;
+    start++;
+    end--;
+  }
 }
 
 console.log("Q5:", rotateArray([1, 2, 3, 4, 5], 2));
