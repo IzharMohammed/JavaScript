@@ -172,10 +172,27 @@ console.log("Q6:", twoSum([2, 7, 11, 15], 9));
 // Concepts: Two pointers
 // -----------------------------------------------------------
 function moveZeros(arr) {
-  // TODO
+  let idx = 0; // position to place next non-zero
+
+  // Step 1: Move all non-zero elements forward
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] !== 0) {
+      arr[idx] = arr[i];
+      idx++;
+    }
+  }
+
+  // Step 2: Fill remaining positions with zero
+  while (idx < arr.length) {
+    arr[idx] = 0;
+    idx++;
+  }
+
+  return arr;
 }
 
 console.log("Q7:", moveZeros([0, 1, 0, 3, 12]));
+// Output: [1, 3, 12, 0, 0]
 
 // -----------------------------------------------------------
 // Q8. Find Second Largest Element
