@@ -51,9 +51,37 @@ console.log("-".repeat(30));
 // Description: Check if a string reads the same backward as forward.
 // Input: "racecar" -> true, "hello" -> false
 // -----------------------------------------------------------
+// M-1 uses extra space
+function isPalindrome1(str) {
+  const arr = str.split("");
+  let left = 0,
+    right = arr.length - 1;
+
+  //   str.toLowerCase().replace(/[^a-z0-9]/g, ""); // if asked ignore and spaces
+
+  while (left < right) {
+    if (arr[left] !== arr[right]) {
+      return false;
+    }
+    left++;
+    right--;
+  }
+
+  return true;
+}
+
+// M-2 efficient
 function isPalindrome(str) {
-  // TODO: Write your logic here
-  return false;
+  let left = 0;
+  let right = str.length - 1;
+
+  while (left < right) {
+    if (str[left] !== str[right]) return false;
+    left++;
+    right--;
+  }
+
+  return true;
 }
 
 console.log("Q2 Output:", isPalindrome("racecar"));
