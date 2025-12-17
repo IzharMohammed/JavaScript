@@ -10,7 +10,7 @@
 // Output: [1,2,5,8]
 // -----------------------------------------------------------
 function sortAscending(arr) {
-  // TODO
+
 }
 
 console.log("Q7:", sortAscending([5, 2, 8, 1]));
