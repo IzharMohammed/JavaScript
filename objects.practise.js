@@ -23,12 +23,30 @@ INSTRUCTIONS:
 // Edge case: empty array → {}
 // -----------------------------------------------------------
 function countFrequency(arr) {
-    // TODO
+  if (arr.length === 0) return {};
+
+  let ans = {};
+  //   M-1
+  //   for (let i = 0; i < arr.length; i++) {
+  //     let current = arr[i];
+
+  //     if (ans[current] === undefined) {
+  //       ans[current] = 1;
+  //     } else {
+  //       ans[current] = ans[current] + 1;
+  //     }
+  //   }
+
+  //   M-2
+  for (let num of arr) {
+    ans[num] = (ans[num] || 0) + 1;
+  }
+
+  return ans;
 }
 
 console.log("Q1:", countFrequency([1, 2, 2, 3, 3, 3]));
 console.log("Q1 Edge:", countFrequency([]));
-
 
 // -----------------------------------------------------------
 // Q2. Find Duplicates Using Object
@@ -39,12 +57,11 @@ console.log("Q1 Edge:", countFrequency([]));
 // Edge case: no duplicates → []
 // -----------------------------------------------------------
 function findDuplicates(arr) {
-    // TODO
+  // TODO
 }
 
 console.log("Q2:", findDuplicates([1, 2, 3, 2, 4, 1]));
 console.log("Q2 Edge:", findDuplicates([1, 2, 3]));
-
 
 // -----------------------------------------------------------
 // Q3. Group Words by Anagram
@@ -55,12 +72,11 @@ console.log("Q2 Edge:", findDuplicates([1, 2, 3]));
 // Edge case: single word
 // -----------------------------------------------------------
 function groupAnagrams(words) {
-    // TODO
+  // TODO
 }
 
 console.log("Q3:", groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"]));
 console.log("Q3 Edge:", groupAnagrams(["abc"]));
-
 
 // -----------------------------------------------------------
 // Q4. Two Sum Using HashMap
@@ -71,12 +87,11 @@ console.log("Q3 Edge:", groupAnagrams(["abc"]));
 // Edge case: negative numbers
 // -----------------------------------------------------------
 function twoSum(arr, target) {
-    // TODO
+  // TODO
 }
 
 console.log("Q4:", twoSum([2, 7, 11, 15], 9));
 console.log("Q4 Edge:", twoSum([-3, 4, 3, 90], 0));
-
 
 // -----------------------------------------------------------
 // Q5. Most Frequent Element
@@ -87,12 +102,11 @@ console.log("Q4 Edge:", twoSum([-3, 4, 3, 90], 0));
 // Edge case: multiple max frequency → return any
 // -----------------------------------------------------------
 function mostFrequent(arr) {
-    // TODO
+  // TODO
 }
 
 console.log("Q5:", mostFrequent([1, 3, 2, 1, 4, 1]));
 console.log("Q5 Edge:", mostFrequent([5, 5, 6, 6]));
-
 
 /*
 ============================================================
