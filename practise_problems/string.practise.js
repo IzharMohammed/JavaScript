@@ -94,9 +94,23 @@ console.log("-".repeat(30));
 // Input: "hello"
 // Output: { h: 1, e: 1, l: 2, o: 1 }
 // -----------------------------------------------------------
+
+// M-1 object approach
+function charFrequency1(str) {
+  let freq = {};
+  for (let i = 0; i < str.length; i++) {
+    freq[str[i]] = (freq[str[i]] || 0) + 1;
+  }
+  return freq;
+}
+
+// M-2 Map approach
 function charFrequency(str) {
-  // TODO: Write your logic here
-  return {};
+  const map = new Map();
+  for (let char of str) {
+    map.set(char, (map.get(char) || 0) + 1);
+  }
+  return Object.fromEntries(map);
 }
 
 console.log("Q3 Output:", charFrequency("hello"));
