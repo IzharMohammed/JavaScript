@@ -119,11 +119,32 @@ console.log("Q3 Edge:", groupAnagrams(["abc"]));
 function twoSum(arr, target) {
   let ans = {};
 
-  for (let num of arr) {
-    const current = num;
+  for (let i = 0; i < arr.length; i++) {
+    const current = arr[i];
     const remaining = target - current;
-    if(ans[remaining])
+
+    if (ans[remaining] === undefined) {
+      ans[current] = i;
+    } else {
+      return [ans[remaining], i];
+    }
   }
+
+  return ans;
+}
+
+// Map version
+function twoSum1(arr, target) {
+  const map = new Map();
+  for (let i = 0; i < arr.length; i++) {
+    const remaining = target - arr[i];
+    if (map.has(remaining)) {
+      return [map.get(remaining), i];
+    }
+
+    map.set(arr[i], i);
+  }
+  return [];
 }
 
 console.log("Q4:", twoSum([2, 7, 11, 15], 9));
