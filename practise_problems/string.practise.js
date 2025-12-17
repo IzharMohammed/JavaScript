@@ -147,8 +147,24 @@ console.log("-".repeat(30));
 // Output: true
 // -----------------------------------------------------------
 function isAnagram(str1, str2) {
-  // TODO: Write your logic here
-  return false;
+  if (str1.length !== str2.length) return false;
+
+  let freq1 = {};
+  let freq2 = {};
+
+  for (let char of str1) {
+    freq1[char] = (freq1[char] || 0) + 1;
+  }
+
+  for (let char of str2) {
+    freq2[char] = (freq2[char] || 0) + 1;
+  }
+
+  for (let char of str1) {
+    if (freq1[char] !== freq2[char]) return false;
+  }
+
+  return true;
 }
 
 console.log("Q5 Output:", isAnagram("listen", "silent"));
