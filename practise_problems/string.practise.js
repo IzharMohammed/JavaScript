@@ -1,6 +1,6 @@
 /*
 ============================================================
- 🧵 STRINGS PRACTICE — SDE 1 (INTERVIEW PREP)
+  STRINGS PRACTICE — SDE 1 (INTERVIEW PREP)
 ============================================================
  INSTRUCTIONS:
  1. Write the logic inside each function.
@@ -15,15 +15,36 @@
 // Input: "hello"
 // Output: "olleh"
 // -----------------------------------------------------------
+function reverseString1(str) {
+  let arr = str.split("");
+  console.log(arr);
+
+  let left = 0,
+    right = str.length - 1;
+
+  while (left < right) {
+    swap(arr, left, right);
+    left++;
+    right--;
+  }
+
+  return arr.join("");
+}
+
+function swap(arr, left, right) {
+  let something = arr[left];
+  arr[left] = arr[right];
+  arr[right] = something;
+}
+
+// M-2 Built in
 function reverseString(str) {
-    // TODO: Write your logic here
-    return "";
+  return str.split("").reverse().join("");
 }
 
 console.log("Q1 Output:", reverseString("hello"));
 console.log("Q1 Expected: olleh");
 console.log("-".repeat(30));
-
 
 // -----------------------------------------------------------
 // Q2. Check Palindrome
@@ -31,14 +52,13 @@ console.log("-".repeat(30));
 // Input: "racecar" -> true, "hello" -> false
 // -----------------------------------------------------------
 function isPalindrome(str) {
-    // TODO: Write your logic here
-    return false;
+  // TODO: Write your logic here
+  return false;
 }
 
 console.log("Q2 Output:", isPalindrome("racecar"));
 console.log("Q2 Expected: true");
 console.log("-".repeat(30));
-
 
 // -----------------------------------------------------------
 // Q3. Count Character Frequency
@@ -47,14 +67,13 @@ console.log("-".repeat(30));
 // Output: { h: 1, e: 1, l: 2, o: 1 }
 // -----------------------------------------------------------
 function charFrequency(str) {
-    // TODO: Write your logic here
-    return {};
+  // TODO: Write your logic here
+  return {};
 }
 
 console.log("Q3 Output:", charFrequency("hello"));
 console.log("Q3 Expected: { h: 1, e: 1, l: 2, o: 1 }");
 console.log("-".repeat(30));
-
 
 // -----------------------------------------------------------
 // Q4. First Non-Repeating Character
@@ -63,14 +82,13 @@ console.log("-".repeat(30));
 // Output: "c"
 // -----------------------------------------------------------
 function firstNonRepeatingChar(str) {
-    // TODO: Write your logic here
-    return null;
+  // TODO: Write your logic here
+  return null;
 }
 
 console.log("Q4 Output:", firstNonRepeatingChar("aabbcdd"));
 console.log("Q4 Expected: c");
 console.log("-".repeat(30));
-
 
 // -----------------------------------------------------------
 // Q5. Check Anagram
@@ -79,14 +97,13 @@ console.log("-".repeat(30));
 // Output: true
 // -----------------------------------------------------------
 function isAnagram(str1, str2) {
-    // TODO: Write your logic here
-    return false;
+  // TODO: Write your logic here
+  return false;
 }
 
 console.log("Q5 Output:", isAnagram("listen", "silent"));
 console.log("Q5 Expected: true");
 console.log("-".repeat(30));
-
 
 // -----------------------------------------------------------
 // Q6. Longest Word in a Sentence
@@ -95,14 +112,13 @@ console.log("-".repeat(30));
 // Output: "programming"
 // -----------------------------------------------------------
 function longestWord(sentence) {
-    // TODO: Write your logic here
-    return "";
+  // TODO: Write your logic here
+  return "";
 }
 
 console.log("Q6 Output:", longestWord("I love JavaScript programming"));
 console.log("Q6 Expected: programming");
 console.log("-".repeat(30));
-
 
 // -----------------------------------------------------------
 // Q7. Remove Duplicate Characters
@@ -111,8 +127,8 @@ console.log("-".repeat(30));
 // Output: "progamin" (order may vary based on implementation, usually first occurrence kept)
 // -----------------------------------------------------------
 function removeDuplicates(str) {
-    // TODO: Write your logic here
-    return "";
+  // TODO: Write your logic here
+  return "";
 }
 
 console.log("Q7 Output:", removeDuplicates("programming"));
