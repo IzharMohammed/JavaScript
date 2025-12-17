@@ -1,179 +1,135 @@
-//  Promises in js
-// Synchronous vs asynchronous code
+/**
+ * ==========================================
+ * 📘 JAVASCRIPT PROMISES - QUICK REVISION
+ * ==========================================
+ * 
+ * 1. WHAT IS A PROMISE?
+ * ---------------------
+ * A Promise is an object representing the eventual completion (or failure) 
+ * of an asynchronous operation and its resulting value.
+ * 
+ * Think of it like ordering food at a restaurant:
+ * - You place an order (Promise created).
+ * - You get a buzzer (The Promise object).
+ * - While waiting, you can do other things (Asynchronous).
+ * - Eventually, the buzzer rings (Resolved) or they tell you they're out of ingredients (Rejected).
+ */
 
-// Async code
-console.log("start");
+/**
+ * 2. PROMISE STATES
+ * -----------------
+ * A Promise can be in one of three states:
+ * 1. PENDING: Initial state, neither fulfilled nor rejected.
+ * 2. FULFILLED (Resolved): Operation completed successfully.
+ * 3. REJECTED: Operation failed.
+ */
 
-setTimeout(() => {
-    console.log("i am inside setTimeout");
-}, 0);
+// ==========================================
+// 3. CREATING A PROMISE
+// ==========================================
 
-console.log("end");
-//  js is single threaded and js first execute all sync code and then async code
+const myPromise = new Promise((resolve, reject) => {
+    // Simulate an async operation (e.g., fetching data)
+    const success = true;
 
-
-// callbacks - They are used to handle async code
-console.log("start");
-
-function importantFunc(userName, callback) {
     setTimeout(() => {
-        callback(`Hello ${userName}`);
-    }, 1000)
-}
-
-function goingToMarket(userName, callback) {
-    setTimeout(() => {
-        callback(`Market visited by ${userName}`);
-    }, 1000)
-}
-
-function shopping(userName, callback) {
-    setTimeout(() => {
-        callback(`Shopping done by ${userName}`);
-    }, 1000)
-}
-
-// // callback hell - nested callbacks
-// importantFunc("izhar", (message) => {
-//     console.log(message);
-//     goingToMarket("izhar", (message) => {
-//         console.log(message);
-//         shopping("izhar", (message) => {
-//             console.log(message);
-//         });
-//     });
-// });
-
-// console.log("stop");
-
-// promises
-console.log("start");
-
-function importantFunc(userName) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(`Hello ${userName}`);
-        }, 1000)
-    })
-}
-
-function goingToMarket(userName) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(`Market visited by ${userName}`);
-        }, 1000)
-    })
-}
-
-function shopping(userName) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(`Shopping done by ${userName}`);
-        }, 1000)
-    })
-}
-
-// Promise Chaining
-importantFunc("izhar").then((message) => {
-    console.log(message);
-    return goingToMarket("izhar");
-}).then((message) => {
-    console.log(message);
-    return shopping("izhar");
-}).then((message) => {
-    console.log(message);
-}).catch((error) => {
-    console.log(error);
-})
-
-console.log("stop");
-// Promise combinators
-// Promise.all
-
-Promise.all([
-    importantFunc("izhar"),
-    goingToMarket("izhar"),
-    shopping("izhar")
-]).then((messages) => {
-    console.log("All promises resolved", messages);
-}).catch((error) => {
-    console.log("All promises rejected", error);
-})
-
-// Promise.race
-Promise.race([
-    importantFunc("izhar"),
-    goingToMarket("izhar"),
-    shopping("izhar")
-]).then((messages) => {
-    console.log("All promises resolved", messages);
-}).catch((error) => {
-    console.log("All promises rejected", error);
-})
-
-// promise.allSettled
-Promise.allSettled([
-    importantFunc("izhar"),
-    goingToMarket("izhar"),
-    shopping("izhar")
-]).then((messages) => {
-    console.log("All promises resolved", messages);
-}).catch((error) => {
-    console.log("All promises rejected", error);
-})
-
-// Promise.any
-Promise.any([
-    importantFunc("izhar"),
-    goingToMarket("izhar"),
-    shopping("izhar")
-]).then((messages) => {
-    console.log("All promises resolved", messages);
-}).catch((error) => {
-    console.log("All promises rejected", error);
-})
-
-console.log("stop");
-
-
-const sub = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        const result = false;
-        if (result) {
-            resolve("subscribed");
+        if (success) {
+            // resolve(value) changes state from Pending -> Fulfilled
+            resolve("Operation Successful! ✅");
         } else {
-            reject("not subscribed");
+            // reject(error) changes state from Pending -> Rejected
+            reject("Operation Failed! ❌");
         }
-    }, 1000)
-})
+    }, 1000);
+});
 
-console.log(sub);
+// ==========================================
+// 4. CONSUMING A PROMISE
+// ==========================================
+// We use .then() for success, .catch() for errors, and .finally() for cleanup.
 
-sub.then((message) => {
-    console.log(message);
-}).catch((error) => {
-    console.log(error);
-})
+console.log("1. Waiting for promise...");
 
-console.log("start");
+myPromise
+    .then((data) => {
+        console.log("2. Success:", data); // Runs if resolved
+    })
+    .catch((error) => {
+        console.error("2. Error:", error); // Runs if rejected
+    })
+    .finally(() => {
+        console.log("3. Cleanup: Operation finished (success or fail)."); // Always runs
+    });
 
-const promise1 = Promise.resolve("Promise 1");
-promise1.then((message) => {
-    console.log(message);
-}).catch((error) => {
-    console.log(error);
-})
 
-console.log("stop");
+// ==========================================
+// 5. PROMISE CHAINING (Avoiding Callback Hell)
+// ==========================================
+// Instead of nesting callbacks, we return a new Promise in .then()
 
-// Async/await
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+wait(500)
+    .then(() => {
+        console.log("Step 1 completed");
+        return wait(500); // Return a new promise
+    })
+    .then(() => {
+        console.log("Step 2 completed");
+        return wait(500);
+    })
+    .then(() => {
+        console.log("Step 3 completed");
+    });
+
+
+// ==========================================
+// 6. PROMISE COMBINATORS (Handling multiple promises)
+// ==========================================
+
+const p1 = new Promise(resolve => setTimeout(() => resolve("A"), 100));
+const p2 = new Promise(resolve => setTimeout(() => resolve("B"), 200));
+const p3 = new Promise((_, reject) => setTimeout(() => reject("Error!"), 300));
+
+// A. Promise.all()
+// Waits for ALL to resolve. Fails if ANY fails.
+Promise.all([p1, p2])
+    .then(results => console.log("Promise.all:", results)) // ["A", "B"]
+    .catch(err => console.log("Promise.all failed:", err));
+
+// B. Promise.race()
+// Returns result of the FIRST one to settle (resolve or reject).
+Promise.race([p1, p2])
+    .then(result => console.log("Promise.race:", result)); // "A" (because 100ms < 200ms)
+
+// C. Promise.allSettled()
+// Waits for ALL to finish, regardless of success or failure.
+Promise.allSettled([p1, p2, p3])
+    .then(results => console.log("Promise.allSettled:", results));
+// Returns array of objects: { status: 'fulfilled', value: ... } or { status: 'rejected', reason: ... }
+
+// D. Promise.any()
+// Waits for the FIRST successful resolution. Fails only if ALL fail.
+Promise.any([p3, p2, p1])
+    .then(result => console.log("Promise.any:", result)); // "B" (skips p3 because it rejected)
+
+
+// ==========================================
+// 7. ASYNC / AWAIT (Modern Syntax)
+// ==========================================
+// Syntactic sugar over Promises. Makes async code look synchronous.
+
 async function fetchData() {
     try {
-        const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-        const data = await response.json();
-        console.log(data);
+        console.log("Fetching data...");
+        // await pauses execution until the Promise resolves
+        const result = await myPromise;
+        console.log("Async/Await Result:", result);
     } catch (error) {
-        console.log(error);
+        // Handle errors with try/catch blocks
+        console.error("Async/Await Error:", error);
     }
 }
 
