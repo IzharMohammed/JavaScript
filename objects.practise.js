@@ -56,8 +56,40 @@ console.log("Q1 Edge:", countFrequency([]));
 // Output: [1,2]
 // Edge case: no duplicates → []
 // -----------------------------------------------------------
+function findDuplicates1(arr) {
+  let freq = {};
+  const duplicates = [];
+  // Step 1: Build frequency map
+  for (let num of arr) {
+    freq[num] = (freq[num] || 0) + 1;
+  }
+
+  // Step 2: Collect duplicates
+  for (let key in freq) {
+    if (freq[key] > 1) {
+      duplicates.push(Number(key));
+    }
+  }
+
+  return duplicates;
+}
+
+// M-2
 function findDuplicates(arr) {
-  // TODO
+  const freqMap = new Map();
+  const duplicates = [];
+
+  for (let num of arr) {
+    freqMap.set(num, (freqMap.get(num) || 0) + 1);
+  }
+
+  for (let [key, value] of freqMap) {
+    if (value > 1) {
+      duplicates.push(key);
+    }
+  }
+
+  return duplicates;
 }
 
 console.log("Q2:", findDuplicates([1, 2, 3, 2, 4, 1]));
@@ -71,9 +103,7 @@ console.log("Q2 Edge:", findDuplicates([1, 2, 3]));
 // Output: [["eat","tea","ate"],["tan","nat"],["bat"]]
 // Edge case: single word
 // -----------------------------------------------------------
-function groupAnagrams(words) {
-  // TODO
-}
+function groupAnagrams(words) {}
 
 console.log("Q3:", groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"]));
 console.log("Q3 Edge:", groupAnagrams(["abc"]));
@@ -87,7 +117,13 @@ console.log("Q3 Edge:", groupAnagrams(["abc"]));
 // Edge case: negative numbers
 // -----------------------------------------------------------
 function twoSum(arr, target) {
-  // TODO
+  let ans = {};
+
+  for (let num of arr) {
+    const current = num;
+    const remaining = target - current;
+    if(ans[remaining])
+  }
 }
 
 console.log("Q4:", twoSum([2, 7, 11, 15], 9));
