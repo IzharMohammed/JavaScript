@@ -159,7 +159,22 @@ console.log("Q4 Edge:", twoSum([-3, 4, 3, 90], 0));
 // Edge case: multiple max frequency → return any
 // -----------------------------------------------------------
 function mostFrequent(arr) {
-  // TODO
+  let freq = {};
+  let maxCount = 0;
+  let maxElement = null;
+
+  for (let num of arr) {
+    freq[num] = (freq[num] || 0) + 1;
+  }
+
+  for (let key in freq) {
+    if (freq[key] > maxCount) {
+      maxCount = freq[key];
+      maxElement = Number(key);
+    }
+  }
+
+  return maxElement;
 }
 
 console.log("Q5:", mostFrequent([1, 3, 2, 1, 4, 1]));
