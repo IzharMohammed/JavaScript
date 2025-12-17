@@ -219,9 +219,34 @@ console.log("-".repeat(30));
 // Input: "programming"
 // Output: "progamin" (order may vary based on implementation, usually first occurrence kept)
 // -----------------------------------------------------------
+// M-1
+function removeDuplicates1(str) {
+  let freq = {};
+  for (let i = 0; i < str.length; i++) {
+    freq[str[i]] = (freq[str[i]] || 0) + 1;
+  }
+
+  return Object.keys(freq).join("");
+}
+
+// M-2
+
 function removeDuplicates(str) {
-  // TODO: Write your logic here
-  return "";
+  let freq = {};
+  let result = "";
+  for (let ch of str) {
+    if (!freq[ch]) {
+      freq[ch] = 1;
+      result += ch;
+    }
+  }
+
+  return result;
+}
+
+// using set
+function removeDuplicates2(str) {
+  return [...new Set(str)].join("");
 }
 
 console.log("Q7 Output:", removeDuplicates("programming"));
