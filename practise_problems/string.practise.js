@@ -146,7 +146,8 @@ console.log("-".repeat(30));
 // Input: "listen", "silent"
 // Output: true
 // -----------------------------------------------------------
-function isAnagram(str1, str2) {
+// M-1
+function isAnagram1(str1, str2) {
   if (str1.length !== str2.length) return false;
 
   let freq1 = {};
@@ -162,6 +163,24 @@ function isAnagram(str1, str2) {
 
   for (let char of str1) {
     if (freq1[char] !== freq2[char]) return false;
+  }
+
+  return true;
+}
+
+// M-2 (optimized)
+function isAnagram(str1, str2) {
+  if (str1.length !== str2.length) return false;
+
+  const freq = {};
+
+  for (let ch of str1) {
+    freq[ch] = (freq[ch] || 0) + 1;
+  }
+
+  for (let ch of str2) {
+    if (!freq[ch]) return false;
+    freq[ch]--;
   }
 
   return true;
