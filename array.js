@@ -134,8 +134,33 @@ console.log("Q5:", rotateArray([1, 2, 3, 4, 5], 2));
 // Output: [0,1]
 // Concepts: Hash Map
 // -----------------------------------------------------------
+// Not optimal
+function twoSum_1(arr, target) {
+  let left = 0,
+    right = arr.length - 1;
+
+  while (left < right) {
+    if (arr[left] + arr[right] === target) return [left, right];
+    if (arr[left] + arr[right] < target) left++;
+    if (arr[left] + arr[right] > target) right--;
+  }
+}
+
 function twoSum(arr, target) {
-  // TODO
+  const seen = {}; // stores number -> index
+
+  for (let i = 0; i < arr.length; i++) {
+    const current = arr[i];
+    const needed = target - current;
+
+    // If we already saw the required number
+    if (seen[needed] !== undefined) {
+      return [seen[needed], i];
+    }
+
+    // Store current number with its index
+    seen[current] = i;
+  }
 }
 
 console.log("Q6:", twoSum([2, 7, 11, 15], 9));
