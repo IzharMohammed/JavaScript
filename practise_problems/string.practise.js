@@ -124,7 +124,15 @@ console.log("-".repeat(30));
 // Output: "c"
 // -----------------------------------------------------------
 function firstNonRepeatingChar(str) {
-  // TODO: Write your logic here
+  let freq = {};
+  for (let i = 0; i < str.length; i++) {
+    freq[str[i]] = (freq[str[i]] || 0) + 1;
+  }
+
+  for (let key of str) {
+    if (freq[key] === 1) return key;
+  }
+
   return null;
 }
 
