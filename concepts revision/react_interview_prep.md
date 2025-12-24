@@ -106,6 +106,159 @@ function ThemedButton() {
 }
 ```
 
+---
+
+## 6. Advanced Topics
+
+### `useState` vs `useReducer`
+**When to use `useReducer`:**
+- Complex state logic with multiple sub-values
+- Next state depends on previous state
+- Multiple ways to update state
+- Need to pass dispatch to children (instead of multiple callbacks)
+
+```javascript
+const [state, dispatch] = useReducer(reducer, initialState);
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment': return { count: state.count + 1 };
+    case 'decrement': return { count: state.count - 1 };
+    case 'reset': return initialState;
+    default: return state;
+  }
+}
+
+// Usage
+dispatch({ type: 'increment' });
+```
+
+---
+
+### Custom Hooks
+Extract reusable stateful logic. Hook names must start with "use".
+
+```javascript
+// useFetch custom hook
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [url]);
+
+  return { data, loading, error };
+}
+
+// Usage
+function Component() {
+  const { data, loading, error } = useFetch('/api/users');
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  return <div>{JSON.stringify(data)}</div>;
+}
+```
+
+---
+
+### Code Splitting & Lazy Loading
+Split your bundle into smaller chunks loaded on-demand for better performance.
+
+```javascript
+// Without code splitting - all loaded at once
+import HeavyComponent from './HeavyComponent';
+
+// With code splitting - loaded when needed
+const HeavyComponent = React.lazy(() => import('./HeavyComponent'));
+
+function App() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HeavyComponent />
+    </Suspense>
+  );
+}
+
+// Route-based code splitting
+const Home = lazy(() => import('./routes/Home'));
+const About = lazy(() => import('./routes/About'));
+
+function App() {
+  return (
+    <Router>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </Suspense>
+    </Router>
+  );
+}
+```
+
+---
+
+### Error Boundaries
+Catch JavaScript errors anywhere in component tree and display fallback UI.
+
+```javascript
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log to error reporting service
+    console.error('Error caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <h1>Something went wrong.</h1>
+          <details>
+            <summary>Error details</summary>
+            <pre>{this.state.error?.toString()}</pre>
+          </details>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Usage
+<ErrorBoundary>
+  <MyApp />
+</ErrorBoundary>
+```
+
+**Error boundaries don't catch:**
+- Errors in event handlers (use try-catch)
+- Asynchronous code (setTimeout, promises)
+- Server-side rendering errors
+- Errors in the error boundary itself
+
+---
+
 ### 🔗 Resources
 - [React Official Docs (New)](https://react.dev/)
 - [Overreacted.io (Dan Abramov's Blog)](https://overreacted.io/)

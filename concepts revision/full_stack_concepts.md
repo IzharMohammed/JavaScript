@@ -103,3 +103,110 @@ Security is a critical part of SDE-1 interviews.
 2. **Load Balancing:** Use Nginx or Cloud Load Balancers to distribute traffic.
 3. **Caching:** Use Redis to cache expensive DB queries.
 4. **Database Indexing:** Add indexes to columns you search frequently to speed up reads.
+
+---
+
+## 6. JavaScript Fundamentals (Must Know)
+
+### Closures
+A closure is when a function "remembers" variables from its outer scope.
+
+```javascript
+function createCounter() {
+  let count = 0; // Private variable
+  
+  return {
+    increment: () => ++count,
+    decrement: () => --count,
+    getCount: () => count
+  };
+}
+
+const counter = createCounter();
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+console.log(counter.getCount());  // 2
+// console.log(count); // ReferenceError - private!
+```
+
+**Use cases:**
+- Data encapsulation/privacy
+- Factory functions
+- Event handlers
+- Module pattern
+
+---
+
+### Debouncing vs Throttling
+
+**Debouncing:** Delays execution until user stops triggering for N ms.
+```javascript
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Use: Search bar (wait until user stops typing)
+const search = debounce((query) => {
+  fetch(`/api/search?q=${query}`);
+}, 300);
+
+input.addEventListener('input', (e) => search(e.target.value));
+```
+
+**Throttling:** Execute at most once per N ms.
+```javascript
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+// Use: Scroll events (limit frequency)
+const handleScroll = throttle(() => {
+  console.log('Scroll:', window.scrollY);
+}, 1000);
+
+window.addEventListener('scroll', handleScroll);
+```
+
+---
+
+### `call`, `apply`, and `bind`
+
+All three set the `this` value of a function.
+
+```javascript
+const person = { name: 'Alice' };
+
+function greet(greeting, punctuation) {
+  console.log(`${greeting}, ${this.name}${punctuation}`);
+}
+
+// call: Invoke immediately, args individually
+greet.call(person, 'Hello', '!'); // "Hello, Alice!"
+
+// apply: Invoke immediately, args as array
+greet.apply(person, ['Hi', '.']); // "Hi, Alice."
+
+// bind: Returns new function (not invoked)
+const greetAlice = greet.bind(person);
+greetAlice('Hey', '!!'); // "Hey, Alice!!"
+
+// Partial application
+const sayHello = greet.bind(person, 'Hello');
+sayHello('!!!'); // "Hello, Alice!!!"
+```
+
+**Key Difference:**
+- `call/apply`: Execute immediately
+- `bind`: Returns bound function
+

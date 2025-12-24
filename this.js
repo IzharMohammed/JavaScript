@@ -1,158 +1,140 @@
-// this keyword in js has implicit binding
+/**
+ * ==========================================
+ * 👈 THE 'this' KEYWORD IN JAVASCRIPT
+ * ==========================================
+ * 
+ * 1. WHAT IS 'this'?
+ * ------------------
+ * 'this' refers to the object that is executing the current function.
+ * Its value depends on HOW the function is called (Runtime Binding).
+ */
 
-this.a = 5;
-// In function this keyword refers to global object<
-function test() {
-    console.log(this.a);
+// ==========================================
+// 2. GLOBAL CONTEXT
+// ==========================================
+console.log(this); // Window (in browser) or {} (in Node.js)
+
+
+// ==========================================
+// 3. FUNCTION CONTEXT (Normal vs Arrow)
+// ==========================================
+
+// A. Normal Function
+// In non-strict mode, 'this' refers to Global Object (Window/global).
+// In strict mode, 'this' is undefined.
+function showThis() {
+    console.log("Normal Function:", this);
 }
-test();
-// In arrow function this keyword refers to parent object
-const testArrow = () => {
-    console.log(this.a);
-}
-testArrow();
+showThis();
 
-// In object this keyword refers to object
+// B. Arrow Function
+// Arrow functions DO NOT have their own 'this'.
+// They inherit 'this' from the parent scope (Lexical Scoping).
+const showArrowThis = () => {
+    console.log("Arrow Function:", this);
+};
+showArrowThis(); // {} (Inherits from global scope in this file)
 
-let user = {
+
+// ==========================================
+// 4. OBJECT METHOD CONTEXT
+// ==========================================
+
+const user = {
     name: "Izhar",
-    age: 20,
-    childObj: {
-        newName: "Izhar new",
-        newAge: 21,
-        printDetails() {
-            console.log(this.newName, "and", this.name);
-        }
+
+    // Normal Method: 'this' refers to the object calling the method (user)
+    printName() {
+        console.log("Method (Normal):", this.name);
     },
-    // Arrow function does not have its own this, it takes this from parent scope
-    getDetails: () => {
-        console.log(this.name, this.age);
-        console.log(this);
+
+    // Arrow Method: 'this' refers to parent scope (Global/Window), NOT the object
+    printNameArrow: () => {
+        console.log("Method (Arrow):", this.name); // undefined
     },
-    // Normal function has its own this
-    printDetails() {
-        console.log(this.name, this.age);
-    }
-}
-user.childObj.printDetails();
-user.getDetails();
-user.printDetails();
-console.log("=".repeat(50));
 
-
-// Inside of a class this keyword refers to all variables inside constructor
-class User {
-    constructor(name, age) {
-        this.name = name;
-        this.age = age;
-    }
-    printDetails() {
-        console.log(this.name, this.age);
-    }
-}
-
-const user1 = new User("Izhar", 21);
-user1.printDetails();
-
-// o/p based questions
-const user2 = {
-    firstName: "Izhar",
-    getName() {
-        const firstName = "Izhar new";
-        return this.firstName;
-    }
-}
-console.log(user2.getName());
-
-console.log("=".repeat(50));
-
-// what is the result of accessing its ref
-function makeUser() {
-    return {
-        name: "Izhar",
-        ref: this
-    };
-}
-
-let user3 = makeUser();
-console.log(user3.ref.name);
-
-// # Fix
-function makeUser1() {
-    return {
-        name: "Izhar",
-        ref() {
-            return this;
+    // Nested Object
+    address: {
+        city: "Mumbai",
+        printCity() {
+            console.log("Nested Method:", this.city); // "Mumbai"
         }
-    };
+    }
+};
+
+user.printName();       // "Izhar"
+user.printNameArrow();  // undefined
+user.address.printCity(); // "Mumbai"
+
+
+// ==========================================
+// 5. EXPLICIT BINDING (call, apply, bind)
+// ==========================================
+// Used to manually set 'this' for a function.
+
+const person1 = { name: "Alice" };
+const person2 = { name: "Bob" };
+
+function greet(greeting, punctuation) {
+    console.log(`${greeting}, ${this.name}${punctuation}`);
 }
 
-let user4 = makeUser1();
-console.log(user4.ref().name);
-console.log("=".repeat(50));
+// A. call(): Pass arguments individually
+greet.call(person1, "Hello", "!"); // "Hello, Alice!"
 
-const user5 = {
-    name: "Izhar",
-    logMessage() {
+// B. apply(): Pass arguments as an array
+greet.apply(person2, ["Hi", "."]); // "Hi, Bob."
+
+// C. bind(): Returns a NEW function with 'this' permanently bound
+const greetAlice = greet.bind(person1);
+greetAlice("Hey", "!!"); // "Hey, Alice!!"
+
+
+// ==========================================
+// 6. CONSTRUCTOR FUNCTIONS (new keyword)
+// ==========================================
+// When using 'new', 'this' refers to the newly created instance.
+
+function Car(model) {
+    this.model = model;
+}
+
+const myCar = new Car("Tesla");
+console.log("Constructor:", myCar.model); // "Tesla"
+
+
+// ==========================================
+// 7. COMMON INTERVIEW PITFALLS
+// ==========================================
+
+// Q1: Losing 'this' in callbacks
+const obj = {
+    name: "Object",
+    log() {
         console.log(this.name);
     }
-}
-setTimeout(user5.logMessage, 1000);
-// #fix
-setTimeout(() => {
-    user5.logMessage();
-}, 1000);
-console.log("=".repeat(50));
+};
+setTimeout(obj.log, 100); // undefined (called as plain function)
+
+// Fix 1: Wrapper function
+setTimeout(() => obj.log(), 100); // "Object"
+
+// Fix 2: bind()
+setTimeout(obj.log.bind(obj), 100); // "Object"
 
 
-// let calculator = {
-//     read() {
-//         this.a = +prompt("Enter a");
-//         this.b = +prompt("Enter b");
-//     },
-//     sum() {
-//         return this.a + this.b;
-//     },
-//     mul() {
-//         return this.a * this.b;
-//     }
-// }
-
-// calculator.read();
-// console.log(calculator.sum());
-// console.log(calculator.mul());
-// console.log("=".repeat(50));
-
-var length = 4;
-function callback() {
-    console.log(this.length);
-}
-
-const obj = {
-    length: 5,
-    method(fn) {
-        fn();
-    }
-}
-obj.method(callback); //4
-
-console.log("=".repeat(50));
-
-const calc = {
+// Q2: Method Chaining
+const calculator = {
     total: 0,
-    add(x) {
-        this.total += x;
-        return this;
+    add(n) {
+        this.total += n;
+        return this; // Return 'this' to allow chaining
     },
-    multiply(x) {
-        this.total *= x;
-        return this;
-    },
-    subtract(x) {
-        this.total -= x;
+    subtract(n) {
+        this.total -= n;
         return this;
     }
-}
+};
 
-const result = calc.add(10).multiply(5).subtract(2).add(1);
-console.log(result.total);
+calculator.add(10).subtract(5);
+console.log("Chaining Result:", calculator.total); // 5

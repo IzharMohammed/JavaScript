@@ -98,7 +98,7 @@ app.get('/', (req, res) => {
 - **CommonJS:** Uses `require()` and `module.exports`. Synchronous loading. (Default in Node.js < 14).
 - **ES Modules:** Uses `import` and `export`. Asynchronous loading. (Standard in modern JS/Browsers).
 
-### Q3: How to handle errors in Async/Await?
+### Q3: How do you handle errors in Async/Await?
 Always use `try...catch` blocks.
 ```javascript
 app.get('/users', async (req, res, next) => {
@@ -110,6 +110,199 @@ app.get('/users', async (req, res, next) => {
     }
 });
 ```
+
+---
+
+## 5. Advanced Node.js Concepts
+
+### Streams
+Process data piece by piece instead of loading everything into memory.
+
+**Types:**
+- **Readable**: Read data (file system, HTTP requests)
+- **Writable**: Write data (file system, HTTP responses)
+- **Duplex**: Both read and write (TCP sockets)
+- **Transform**: Modify data while reading/writing (compression, encryption)
+
+```javascript
+const fs = require('fs');
+
+// Bad: Loads entire file into memory
+const data = fs.readFileSync('huge-file.txt', 'utf8');
+
+// Good: Streams data in chunks
+const readStream = fs.createReadStream('huge-file.txt');
+readStream.pipe(process.stdout);
+
+// Example: File processing with transform
+const { Transform } = require('stream');
+
+const upperCaseTransform = new Transform({
+  transform(chunk, encoding, callback) {
+    this.push(chunk.toString().toUpperCase());
+    callback();
+  }
+});
+
+fs.createReadStream('input.txt')
+  .pipe(upperCaseTransform)
+  .pipe(fs.createWriteStream('output.txt'));
+```
+
+**Use streams for:**
+- Large files (videos, logs)
+- Real-time data processing
+- Memory efficiency (process data without loading all at once)
+
+---
+
+### Clustering
+Utilize all CPU cores by creating worker processes.
+
+```javascript
+const cluster = require('cluster');
+const os = require('os');
+const express = require('express');
+
+if (cluster.isMaster) {
+  const numCPUs = os.cpus().length;
+  console.log(`Master ${process.pid} is running`);
+  
+  // Fork workers
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died`);
+    cluster.fork(); // Restart worker
+  });
+} else {
+  const app = express();
+  app.get('/', (req, res) => {
+    res.send(`Handled by worker ${process.pid}`);
+  });
+  app.listen(3000);
+  console.log(`Worker ${process.pid} started`);
+}
+```
+
+**Benefits:**
+- Maximizes CPU utilization
+- Fault tolerance (worker crashes don't affect others)
+- Zero-downtime restarts
+
+---
+
+### WebSockets
+Full-duplex communication for real-time applications.
+
+```javascript
+// Server (using ws library)
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+  
+  ws.on('message', (message) => {
+    console.log('Received:', message);
+    // Broadcast to all clients
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  });
+  
+  ws.on('close', () => console.log('Client disconnected'));
+});
+
+// Client (browser)
+const socket = new WebSocket('ws://localhost:8080');
+socket.onopen = () => socket.send('Hello!');
+socket.onmessage = (event) => console.log('Received:', event.data);
+```
+
+**Use cases:**
+- Chat applications
+- Live notifications
+- Real-time dashboards
+- Multiplayer games
+- Live sports scores
+
+---
+
+### File Uploads (Multer)
+Secure file upload handling.
+
+```javascript
+const multer = require('multer');
+const path = require('path');
+const crypto = require('crypto');
+
+// Storage configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // Generate unique filename
+    const uniqueName = crypto.randomBytes(16).toString('hex');
+    cb(null, uniqueName + path.extname(file.originalname));
+  }
+});
+
+// File filter for security
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|pdf/;
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedTypes.test(file.mimetype);
+  
+  if (mimetype && extname) {
+    return cb(null, true);
+  }
+  cb(new Error('Only images and PDFs allowed'));
+};
+
+const upload = multer({ 
+  storage,
+  fileFilter,
+  limits: { 
+    fileSize: 5 * 1024 * 1024, // 5MB
+    files: 5 // Max 5 files
+  }
+});
+
+// Routes
+app.post('/upload/single', upload.single('file'), (req, res) => {
+  res.json({ file: req.file });
+});
+
+app.post('/upload/multiple', upload.array('files', 5), (req, res) => {
+  res.json({ files: req.files });
+});
+
+// Error handling
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'File too large' });
+    }
+  }
+  res.status(500).json({ error: error.message });
+});
+```
+
+**Security Best Practices:**
+- Validate file type (check MIME type AND extension)
+- Limit file size
+- Use random filenames
+- Store outside public directory
+- Scan for viruses (use antivirus API)
+- Use cloud storage for production (AWS S3, Cloudinary)
+
+---
 
 ### 🔗 Resources
 - [Node.js Event Loop (Official Docs)](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)

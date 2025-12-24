@@ -141,3 +141,158 @@ Partitioning data across multiple servers (shards) to distribute the load.
 10. **What is the difference between Primary Key and Unique Key?**
     *   **Primary Key**: Unique, Not Null, One per table.
     *   **Unique Key**: Unique, Can allow one Null (depending on DB), Multiple per table.
+
+---
+
+## 5. Advanced Database Concepts
+
+### The N+1 Query Problem
+**Problem:** Making N additional queries to fetch related data.
+
+**Example (Bad):**
+```sql
+-- 1 query to get users
+SELECT * FROM users;
+
+-- Then N queries (one per user)
+SELECT * FROM posts WHERE user_id = 1;
+SELECT * FROM posts WHERE user_id = 2;
+-- ... N times
+```
+
+**Solution - Use JOINs:**
+```sql
+-- Single query with JOIN
+SELECT users.*, posts.*
+FROM users
+LEFT JOIN posts ON users.id = posts.user_id;
+```
+
+**Solution - Eager Loading (ORM):**
+```javascript
+// Sequelize example
+const users = await User.findAll({
+  include: [Post] // Automatically does JOIN
+});
+```
+
+---
+
+### Database Transactions
+A sequence of operations performed as a single logical unit.
+
+**Example: Bank Transfer**
+```sql
+BEGIN TRANSACTION;
+
+-- Deduct from account A
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+
+-- Add to account B
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+-- If both succeed
+COMMIT;
+
+-- If any fails
+ROLLBACK;
+```
+
+**In Node.js with PostgreSQL:**
+```javascript
+const client = await pool.connect();
+
+try {
+  await client.query('BEGIN');
+  await client.query('UPDATE accounts SET balance = balance - $1 WHERE id = $2', [100, 1]);
+  await client.query('UPDATE accounts SET balance = balance + $1 WHERE id = $2', [100, 2]);
+  await client.query('COMMIT');
+} catch (e) {
+  await client.query('ROLLBACK');
+  throw e;
+} finally {
+  client.release();
+}
+```
+
+---
+
+### Connection Pooling
+Reusing database connections instead of creating new ones for each request.
+
+**Without pooling (Bad):**
+```javascript
+// Creates new connection every time - SLOW!
+app.get('/users', async (req, res) => {
+  const connection = await createConnection();
+  const users = await connection.query('SELECT * FROM users');
+  await connection.close();
+  res.json(users);
+});
+```
+
+**With pooling (Good):**
+```javascript
+const { Pool } = require('pg');
+
+const pool = new Pool({
+  host: 'localhost',
+  database: 'mydb',
+  max: 20, // Maximum connections in pool
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+app.get('/users', async (req, res) => {
+  const client = await pool.connect(); // Gets from pool
+  try {
+    const result = await client.query('SELECT * FROM users');
+    res.json(result.rows);
+  } finally {
+    client.release(); // Returns to pool (not closed!)
+  }
+});
+```
+
+**Benefits:**
+- Much faster (connections are pre-created)
+- Limits total database connections
+- Handles connection lifecycle automatically
+
+---
+
+### Query Optimization Tips
+
+1. **Use Indexes on WHERE clauses:**
+```sql
+-- Without index - Full table scan
+SELECT * FROM users WHERE email = 'test@example.com';
+
+-- Create index
+CREATE INDEX idx_users_email ON users(email);
+-- Now query is much faster
+```
+
+2. **Avoid SELECT * (select only needed columns):**
+```sql
+-- Bad
+SELECT * FROM users WHERE id = 1;
+
+-- Good
+SELECT id, name, email FROM users WHERE id = 1;
+```
+
+3. **Use LIMIT for large datasets:**
+```sql
+-- Pagination
+SELECT * FROM posts 
+ORDER BY created_at DESC 
+LIMIT 20 OFFSET 40; -- Page 3 (20 items per page)
+```
+
+4. **Analyze queries with EXPLAIN:**
+```sql
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'test@example.com';
+-- Shows execution plan and performance metrics
+```
+
