@@ -6,7 +6,47 @@
 - **Single-Threaded:** Uses a single main thread for execution but delegates I/O tasks to the system kernel (libuv).
 - **Non-Blocking I/O:** Doesn't wait for file/network operations to finish; uses callbacks/promises to handle results later.
 
----
+### What is V8?
+**V8** is the JavaScript engine that **parses and executes** JavaScript code. It powers:
+- **Google Chrome** (browser)
+- **Node.js** (server-side runtime)
+- **Electron** (desktop apps like VS Code, Slack)
+
+**Key Insight:** V8 is **independent** of the browser. This separation enabled Node.js to exist—V8 handles JavaScript execution, while the browser/Node.js provides the APIs (DOM vs File System).
+
+### Other JavaScript Engines
+Different browsers use different engines, but all follow the **ECMAScript (ES)** standard:
+- **Chrome/Node.js/Edge**: V8
+- **Firefox**: SpiderMonkey
+- **Safari**: JavaScriptCore (Nitro)
+
+### How V8 Works: JIT Compilation
+**Common Misconception:** JavaScript is purely interpreted.  
+**Reality:** Modern engines like V8 use **Just-In-Time (JIT) compilation**.
+
+**Process:**
+1. **Parse**: Code → Abstract Syntax Tree (AST)
+2. **Compile**: AST → Machine code (during execution, not before)
+3. **Optimize**: Hot code paths are optimized further
+
+```
+JavaScript Code → V8 Parser → Bytecode → JIT Compiler → Optimized Machine Code
+```
+
+**Why JIT?**
+- **Interpreted code** (old approach): Slow, line-by-line execution
+- **JIT compilation**: Small startup delay, then **much faster** execution
+- Modern web apps run for hours—JIT makes this viable
+
+**Trade-off:**
+- Slightly slower startup (compilation time)
+- Much faster execution (runs native machine code)
+
+**Example Impact:**
+- Google Maps (2004) changed everything—suddenly JS apps had thousands of lines
+- Without JIT, complex apps like Gmail, VS Code, or Figma wouldn't be possible
+
+
 
 ## 2. Node.js vs Browser - Key Differences
 
