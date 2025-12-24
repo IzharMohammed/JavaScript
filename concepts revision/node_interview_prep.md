@@ -8,6 +8,42 @@
 
 ---
 
+## 2. Node.js vs Browser - Key Differences
+
+Both use JavaScript, but the **ecosystem** is completely different.
+
+| Feature | Browser | Node.js |
+| :--- | :--- | :--- |
+| **Environment APIs** | DOM, `window`, `document`, Web APIs (fetch, localStorage, cookies) | File System, OS, Process, Network modules |
+| **Version Control** | You **don't control** what browser users have | You **control** the exact Node.js version |
+| **JavaScript Support** | Must support older browsers (need Babel/transpiling) | Can use latest ES2015+ features directly |
+| **Module System** | ES Modules only (`import`/`export`) | Both CommonJS (`require`) and ES Modules (`import`) |
+| **Use Case** | Frontend (UI, user interactions) | Backend (servers, APIs, CLI tools) |
+
+### Practical Implications
+
+**Browser:**
+```javascript
+// Browser-specific APIs
+document.getElementById('btn').addEventListener('click', () => {});
+localStorage.setItem('user', 'Alice');
+fetch('/api/data').then(res => res.json());
+```
+
+**Node.js:**
+```javascript
+// Node.js-specific APIs
+const fs = require('fs');
+fs.readFile('file.txt', 'utf8', (err, data) => {});
+
+const os = require('os');
+console.log(os.platform()); // 'linux', 'win32', etc.
+```
+
+**Advantage:** Full-stack developers can use **one language** (JavaScript) for both frontend and backend, reducing context switching and leveraging the same skills across the entire stack.
+
+---
+
 ## 2. The Event Loop (Crucial!)
 The Event Loop is what allows Node.js to perform non-blocking I/O operations despite being single-threaded.
 
