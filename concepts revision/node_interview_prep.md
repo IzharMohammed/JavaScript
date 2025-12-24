@@ -380,6 +380,98 @@ app.use((error, req, res, next) => {
 
 ---
 
+### WebAssembly (WASM)
+WebAssembly is a **binary instruction format** that runs at near-native speed in browsers and Node.js.
+
+**What is WebAssembly?**
+- Low-level assembly-like language
+- Compiled from languages like C, C++, Rust, Go
+- Runs in a sandboxed environment alongside JavaScript
+- **Not a replacement** for JavaScript, but a complement
+
+**Why Use WebAssembly?**
+- **Performance**: CPU-intensive tasks run **much faster** than JavaScript
+- **Language Flexibility**: Use C/C++/Rust libraries in JavaScript
+- **Portability**: Same binary runs in browser and Node.js
+
+**Browser vs Node.js:**
+| Feature | Browser | Node.js |
+|---------|---------|---------|
+| **Use Case** | Games, video editing, image processing | Crypto, data processing, ML inference |
+| **Loading** | `fetch()` + `WebAssembly.instantiate()` | `fs.readFileSync()` + compile |
+
+### Node.js with WebAssembly
+
+**Example: Using WASM in Node.js**
+```javascript
+const fs = require('fs');
+
+// Load WASM binary
+const wasmBuffer = fs.readFileSync('./module.wasm');
+
+// Compile and instantiate
+WebAssembly.instantiate(wasmBuffer).then(result => {
+  const { add, multiply } = result.instance.exports;
+  
+  console.log(add(5, 3));      // 8
+  console.log(multiply(4, 7)); // 28
+});
+
+// Async/Await version
+async function loadWasm() {
+  const wasmBuffer = fs.readFileSync('./module.wasm');
+  const { instance } = await WebAssembly.instantiate(wasmBuffer);
+  
+  return instance.exports;
+}
+
+const wasm = await loadWasm();
+console.log(wasm.fibonacci(10)); // Fast execution
+```
+
+**Creating WASM (Rust Example):**
+```rust
+// lib.rs
+#[no_mangle]
+pub extern "C" fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+// Compile to WASM
+// cargo build --target wasm32-unknown-unknown --release
+```
+
+**Real-World Use Cases:**
+1. **Cryptography**: Fast encryption/hashing (bcrypt, argon2)
+2. **Image Processing**: Resize, compress, filters (Sharp library uses WASM)
+3. **Data Processing**: Large dataset transformations
+4. **Machine Learning**: TensorFlow.js uses WASM backend
+5. **Game Servers**: Physics calculations
+
+**Popular WASM Tools for Node.js:**
+- **esbuild**: Super-fast JavaScript bundler (written in Go, compiled to WASM)
+- **SQLite WASM**: Run SQLite in Node.js
+- **ImageMagick WASM**: Image manipulation
+- **FFmpeg WASM**: Video processing
+
+**Performance Comparison:**
+```javascript
+// JavaScript (slower for heavy computation)
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// WASM version is 10-100x faster for large n
+```
+
+**Key Takeaway:**
+- Use **JavaScript** for business logic, I/O, async operations
+- Use **WebAssembly** for CPU-intensive calculations
+- Together, they create high-performance Node.js applications
+
+---
+
 ### 🔗 Resources
 - [Node.js Event Loop (Official Docs)](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
 - [Don't Block the Event Loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)
