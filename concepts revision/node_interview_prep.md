@@ -380,6 +380,145 @@ app.use((error, req, res, next) => {
 
 ---
 
+### Readline Module (Interactive CLI)
+The `readline` module provides an interface for reading data from a Readable stream (like `process.stdin`) one line at a time.
+
+**Use Cases:**
+- Interactive command-line applications
+- User input prompts
+- CLI tools (npm init, create-react-app prompts)
+- REPL (Read-Eval-Print Loop) implementations
+
+**Basic Example:**
+```javascript
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,   // Read from terminal input
+  output: process.stdout  // Write to terminal output
+});
+
+rl.question('What is your name? ', (name) => {
+  console.log(`Hello, ${name}!`);
+  rl.close(); // Always close when done
+});
+```
+
+**Interactive Loop Example:**
+```javascript
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+function askName() {
+  rl.question("What is your name? (type 'bye' to exit): ", (name) => {
+    // Check if user wants to exit
+    if (name.toLowerCase() === 'bye') {
+      console.log("Goodbye! 👋");
+      rl.close(); // Close the readline interface
+      return;
+    }
+    
+    console.log(`Hello ${name}!\n`);
+    askName(); // Recursive call for continuous input
+  });
+}
+
+// Start the conversation
+askName();
+
+// Handle close event
+rl.on('close', () => {
+  console.log('Interface closed');
+  process.exit(0);
+});
+```
+
+**Async/Await Pattern (Modern Approach):**
+```javascript
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+// Promisify the question method
+function askQuestion(query) {
+  return new Promise(resolve => rl.question(query, resolve));
+}
+
+async function main() {
+  const name = await askQuestion('What is your name? ');
+  const age = await askQuestion('What is your age? ');
+  
+  console.log(`Hello ${name}, you are ${age} years old!`);
+  rl.close();
+}
+
+main();
+```
+
+**Useful Methods:**
+- `rl.question(query, callback)`: Ask a question and get user input
+- `rl.close()`: Close the interface (stops accepting input)
+- `rl.pause()`: Pause input stream
+- `rl.resume()`: Resume input stream
+- `rl.on('line', callback)`: Event fired for each line of input
+
+**Real-World Example: Simple Calculator CLI**
+```javascript
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+function calculate() {
+  rl.question('Enter first number: ', (num1) => {
+    rl.question('Enter operator (+, -, *, /): ', (op) => {
+      rl.question('Enter second number: ', (num2) => {
+        const a = parseFloat(num1);
+        const b = parseFloat(num2);
+        let result;
+        
+        switch(op) {
+          case '+': result = a + b; break;
+          case '-': result = a - b; break;
+          case '*': result = a * b; break;
+          case '/': result = a / b; break;
+          default: result = 'Invalid operator';
+        }
+        
+        console.log(`Result: ${result}\n`);
+        
+        rl.question('Calculate again? (y/n): ', (answer) => {
+          if (answer.toLowerCase() === 'y') {
+            calculate();
+          } else {
+            console.log('Goodbye!');
+            rl.close();
+          }
+        });
+      });
+    });
+  });
+}
+
+calculate();
+```
+
+**Key Points:**
+- Always call `rl.close()` when finished to prevent process hanging
+- Use `process.stdin` for terminal input, `process.stdout` for output
+- For complex CLI apps, consider libraries like `inquirer` or `prompts`
+
+---
+
 ### WebAssembly (WASM)
 WebAssembly is a **binary instruction format** that runs at near-native speed in browsers and Node.js.
 
