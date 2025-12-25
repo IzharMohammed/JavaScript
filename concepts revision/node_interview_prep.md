@@ -232,6 +232,428 @@ fs.createReadStream('input.txt')
 
 ---
 
+### File System Operations (fs Module)
+
+The `fs` module provides APIs for interacting with the file system. Understanding sync vs async operations is crucial for interviews.
+
+#### Synchronous vs Asynchronous vs Promises
+
+| Method | Blocking? | Use Case | Return Value |
+|--------|----------|----------|--------------|
+| **Sync** (`readFileSync`) | ✅ Yes | Scripts, initialization | Direct value |
+| **Async** (callback) | ❌ No | Production apps | Via callback |
+| **Promises** (`fs/promises`) | ❌ No | Modern apps with async/await | Promise |
+
+---
+
+#### 1. Reading Files
+
+**Synchronous (Blocking):**
+```javascript
+const fs = require('fs');
+
+// Blocks execution until file is read
+try {
+  const data = fs.readFileSync('file.txt', 'utf8');
+  console.log(data);
+} catch (err) {
+  console.error('Error reading file:', err);
+}
+```
+
+**Asynchronous (Callback):**
+```javascript
+const fs = require('fs');
+
+fs.readFile('file.txt', 'utf8', (err, data) => {
+  if (err) {
+    console.error('Error reading file:', err);
+    return;
+  }
+  console.log(data);
+});
+
+console.log('This runs immediately (non-blocking)');
+```
+
+**Promises (Modern Approach):**
+```javascript
+const fs = require('fs').promises;
+// OR: const fs = require('fs/promises');
+
+async function readFile() {
+  try {
+    const data = await fs.readFile('file.txt', 'utf8');
+    console.log(data);
+  } catch (err) {
+    console.error('Error reading file:', err);
+  }
+}
+
+readFile();
+```
+
+---
+
+#### 2. Writing Files
+
+**Write (Overwrites existing file):**
+```javascript
+const fs = require('fs').promises;
+
+async function writeFile() {
+  try {
+    await fs.writeFile('output.txt', 'Hello World!', 'utf8');
+    console.log('File written successfully');
+  } catch (err) {
+    console.error('Error writing file:', err);
+  }
+}
+```
+
+**Append (Adds to existing file):**
+```javascript
+const fs = require('fs').promises;
+
+async function appendFile() {
+  try {
+    await fs.appendFile('log.txt', 'New log entry\n', 'utf8');
+    console.log('Data appended');
+  } catch (err) {
+    console.error('Error appending file:', err);
+  }
+}
+```
+
+**Synchronous Write (Use sparingly):**
+```javascript
+const fs = require('fs');
+
+try {
+  fs.writeFileSync('config.json', JSON.stringify({ key: 'value' }, null, 2));
+} catch (err) {
+  console.error('Error writing file:', err);
+}
+```
+
+---
+
+#### 3. File Operations
+
+**Check if File Exists:**
+```javascript
+const fs = require('fs').promises;
+
+async function fileExists(path) {
+  try {
+    await fs.access(path); // Throws error if doesn't exist
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Usage
+if (await fileExists('data.txt')) {
+  console.log('File exists');
+}
+```
+
+**Delete File:**
+```javascript
+const fs = require('fs').promises;
+
+async function deleteFile(path) {
+  try {
+    await fs.unlink(path);
+    console.log('File deleted');
+  } catch (err) {
+    console.error('Error deleting file:', err);
+  }
+}
+```
+
+**Rename/Move File:**
+```javascript
+const fs = require('fs').promises;
+
+async function renameFile() {
+  try {
+    await fs.rename('old-name.txt', 'new-name.txt');
+    console.log('File renamed');
+  } catch (err) {
+    console.error('Error renaming file:', err);
+  }
+}
+```
+
+**Copy File:**
+```javascript
+const fs = require('fs').promises;
+
+async function copyFile() {
+  try {
+    await fs.copyFile('source.txt', 'destination.txt');
+    console.log('File copied');
+  } catch (err) {
+    console.error('Error copying file:', err);
+  }
+}
+```
+
+**Get File Stats:**
+```javascript
+const fs = require('fs').promises;
+
+async function getFileInfo(path) {
+  try {
+    const stats = await fs.stat(path);
+    
+    console.log({
+      size: stats.size,           // Size in bytes
+      isFile: stats.isFile(),
+      isDirectory: stats.isDirectory(),
+      created: stats.birthtime,   // Creation time
+      modified: stats.mtime       // Last modified time
+    });
+  } catch (err) {
+    console.error('Error getting file stats:', err);
+  }
+}
+```
+
+---
+
+#### 4. Directory Operations
+
+**Read Directory:**
+```javascript
+const fs = require('fs').promises;
+
+async function listFiles(dirPath) {
+  try {
+    const files = await fs.readdir(dirPath);
+    console.log('Files:', files);
+    
+    // With file types
+    const filesWithTypes = await fs.readdir(dirPath, { withFileTypes: true });
+    filesWithTypes.forEach(file => {
+      console.log(`${file.name} - ${file.isDirectory() ? 'DIR' : 'FILE'}`);
+    });
+  } catch (err) {
+    console.error('Error reading directory:', err);
+  }
+}
+```
+
+**Create Directory:**
+```javascript
+const fs = require('fs').promises;
+
+async function createDir(path) {
+  try {
+    // { recursive: true } creates parent directories if needed
+    await fs.mkdir(path, { recursive: true });
+    console.log('Directory created');
+  } catch (err) {
+    console.error('Error creating directory:', err);
+  }
+}
+
+// Example: Creates all parent directories
+await createDir('logs/2024/december');
+```
+
+**Remove Directory:**
+```javascript
+const fs = require('fs').promises;
+
+async function removeDir(path) {
+  try {
+    // { recursive: true } removes directory and all contents
+    await fs.rm(path, { recursive: true, force: true });
+    console.log('Directory removed');
+  } catch (err) {
+    console.error('Error removing directory:', err);
+  }
+}
+```
+
+---
+
+#### 5. Working with JSON Files
+
+**Read JSON:**
+```javascript
+const fs = require('fs').promises;
+
+async function readJSON(path) {
+  try {
+    const data = await fs.readFile(path, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Error reading JSON:', err);
+    throw err;
+  }
+}
+
+// Usage
+const config = await readJSON('config.json');
+```
+
+**Write JSON:**
+```javascript
+const fs = require('fs').promises;
+
+async function writeJSON(path, data) {
+  try {
+    const jsonString = JSON.stringify(data, null, 2); // Pretty print
+    await fs.writeFile(path, jsonString, 'utf8');
+  } catch (err) {
+    console.error('Error writing JSON:', err);
+    throw err;
+  }
+}
+
+// Usage
+await writeJSON('users.json', { name: 'Alice', age: 25 });
+```
+
+---
+
+#### 6. File Streaming (For Large Files)
+
+**Read Stream:**
+```javascript
+const fs = require('fs');
+
+const readStream = fs.createReadStream('large-file.txt', {
+  encoding: 'utf8',
+  highWaterMark: 16 * 1024 // 16KB chunks
+});
+
+readStream.on('data', (chunk) => {
+  console.log('Received chunk:', chunk.length, 'bytes');
+});
+
+readStream.on('end', () => {
+  console.log('Finished reading file');
+});
+
+readStream.on('error', (err) => {
+  console.error('Error reading stream:', err);
+});
+```
+
+**Write Stream:**
+```javascript
+const fs = require('fs');
+
+const writeStream = fs.createWriteStream('output.txt');
+
+writeStream.write('Line 1\n');
+writeStream.write('Line 2\n');
+writeStream.write('Line 3\n');
+
+writeStream.end(); // Signal that writing is complete
+
+writeStream.on('finish', () => {
+  console.log('Finished writing file');
+});
+```
+
+**Copy Large File (Stream):**
+```javascript
+const fs = require('fs');
+
+const readStream = fs.createReadStream('large-input.txt');
+const writeStream = fs.createWriteStream('large-output.txt');
+
+readStream.pipe(writeStream);
+
+writeStream.on('finish', () => {
+  console.log('File copied successfully');
+});
+```
+
+---
+
+#### 7. Interview Best Practices
+
+**✅ DO:**
+- Use **asynchronous methods** in production (non-blocking)
+- Use **`fs/promises`** with async/await (cleaner code)
+- Use **streams** for large files (memory efficient)
+- Always **handle errors** with try/catch or .catch()
+- Use **`path.join()`** for cross-platform paths
+- Check file existence before operations
+
+**❌ DON'T:**
+- Use sync methods in web servers (blocks event loop)
+- Read entire large files into memory
+- Ignore error handling
+- Hardcode file paths (use `path` module)
+
+**Example: Production-Ready File Read**
+```javascript
+const fs = require('fs').promises;
+const path = require('path');
+
+async function readUserData(userId) {
+  const filePath = path.join(__dirname, 'data', `user-${userId}.json`);
+  
+  try {
+    // Check if file exists
+    await fs.access(filePath);
+    
+    // Read file
+    const data = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error('User not found');
+    }
+    throw new Error('Failed to read user data');
+  }
+}
+```
+
+---
+
+#### 8. Common Interview Questions
+
+**Q1: Difference between `readFile` and `createReadStream`?**
+- `readFile`: Loads entire file into memory (use for small files)
+- `createReadStream`: Reads file in chunks (use for large files, memory efficient)
+
+**Q2: When to use synchronous methods?**
+- **DO use**: Initialization scripts, CLI tools, config loading at startup
+- **DON'T use**: Request handlers, APIs, long-running processes
+
+**Q3: How to handle file upload in Express?**
+- Use **Multer** middleware (handles multipart/form-data)
+- Validate file type and size
+- Store with unique names
+- Use streams for large uploads
+
+**Q4: How to read file line by line?**
+```javascript
+const fs = require('fs');
+const readline = require('readline');
+
+const fileStream = fs.createReadStream('file.txt');
+const rl = readline.createInterface({
+  input: fileStream,
+  crlfDelay: Infinity
+});
+
+for await (const line of rl) {
+  console.log(line);
+}
+```
+
+---
+
 ### Clustering
 Utilize all CPU cores by creating worker processes.
 
