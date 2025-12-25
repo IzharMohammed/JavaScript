@@ -116,252 +116,82 @@ fixed(); // 2, 2
 
 ## 3. Global Execution Context
 
-**What is Execution Context?**
-An environment where JavaScript code is evaluated and executed. It contains:
+**What is Execution Context?**  
+Environment where JavaScript code is evaluated and executed. Contains:
 1. **Variable Environment** (variables, functions)
 2. **Scope Chain** (access to outer scopes)
 3. **`this` binding**
 
+---
+
 ### Types of Execution Contexts
 
-1. **Global Execution Context (GEC)**
-   - Created when the script first runs
-   - Only ONE per program
-   - Creates global object (`window` in browser, `global` in Node.js)
-   - Sets `this` to global object
-
-2. **Function Execution Context (FEC)**
-   - Created whenever a function is invoked
-   - Can be many (one per function call)
-
-3. **Eval Execution Context**
-   - Created by `eval()` function (rarely used)
-
-### Execution Context Phases
-
-Every execution context goes through **two distinct phases**:
-
-#### Phase 1: Memory Creation Phase (Hoisting Phase)
-In this phase, JavaScript engine:
-1. Scans the code **before execution**
-2. Allocates memory for variables and functions
-3. Sets up the scope chain
-4. Determines `this` value
-
-**What happens to different declarations:**
-- `var` variables → Stored with value `undefined`
-- `let`/`const` variables → Stored but **uninitialized** (TDZ begins)
-- Function declarations → Stored with **entire function code**
-- Function expressions → Only variable declaration hoisted (not the function)
-
-#### Phase 2: Code Execution Phase
-In this phase:
-1. JavaScript executes code **line by line**
-2. Assigns actual values to variables
-3. Executes function calls
-4. Creates new execution contexts for function calls
+| Type | Created When | Count | Key Points |
+|------|-------------|-------|------------|
+| **Global (GEC)** | Script starts | Only ONE per program | Creates global object (`window`/`global`), sets `this` |
+| **Function (FEC)** | Function invoked | Many (one per call) | Local variables, arguments, own `this` |
+| **Eval** | `eval()` called | Rare | Avoid using |
 
 ---
 
-### Visual Breakdown: Two Phases
+### Two-Phase Execution ⚡
 
-```mermaid
-graph TB
-    Start[JavaScript Code] --> Phase1[Phase 1: Memory Creation]
-    Phase1 --> Phase2[Phase 2: Code Execution]
-    Phase2 --> End[Program Complete]
-    
-    Phase1 --> P1A[Scan entire code]
-    P1A --> P1B[Allocate memory for variables]
-    P1B --> P1C[Store function definitions]
-    P1C --> P1D[Set up scope chain]
-    
-    Phase2 --> P2A[Execute line by line]
-    P2A --> P2B[Assign values to variables]
-    P2B --> P2C[Execute function calls]
-    P2C --> P2D[Create new execution contexts]
-```
+Every execution context has **2 distinct phases**:
 
----
+#### **Phase 1: Memory Creation (Hoisting)**
+JavaScript scans code **before** execution:
 
-### Example: Step-by-Step Execution
-
-```javascript
-var name = "Alice";
-var age = 25;
-
-function greet() {
-  console.log("Hello, " + name);
-}
-
-greet();
-```
-
-#### **Phase 1: Memory Creation Phase**
-
-| Variable/Function | Memory Allocation |
-|-------------------|------------------|
-| `name` | `undefined` |
-| `age` | `undefined` |
-| `greet` | `function greet() { ... }` (entire function) |
-
-**Memory looks like:**
-```javascript
-// Global Execution Context - Memory Phase
-{
-  name: undefined,
-  age: undefined,
-  greet: function greet() { console.log("Hello, " + name); }
-}
-```
-
-#### **Phase 2: Code Execution Phase**
-
-**Line by line execution:**
-
-```javascript
-// Line 1: var name = "Alice";
-// Memory: { name: "Alice", age: undefined, greet: fn }
-
-// Line 2: var age = 25;
-// Memory: { name: "Alice", age: 25, greet: fn }
-
-// Line 3-5: Function declaration (already in memory, skip)
-
-// Line 7: greet();
-// Create new Function Execution Context for greet()
-// Output: "Hello, Alice"
-// Return to Global Execution Context
-```
-
----
-
-### Complete Example with `let`/`const`
-
-```javascript
-console.log(x); // What happens here?
-let x = 10;
-
-var y = 20;
-console.log(y);
-
-function test() {
-  return "Hello";
-}
-console.log(test());
-```
-
-#### **Phase 1: Memory Creation**
-
-```javascript
-// Global Execution Context - Memory
-{
-  x: <uninitialized> (TDZ starts),
-  y: undefined,
-  test: function test() { return "Hello"; }
-}
-```
+| Declaration | Memory Allocation |
+|------------|-------------------|
+| `var` | `undefined` |
+| `let`/`const` | `<uninitialized>` (TDZ starts) |
+| Function Declaration | Entire function code |
+| Function Expression | Only variable declaration |
 
 #### **Phase 2: Code Execution**
+- Executes line by line
+- Assigns actual values
+- Creates new execution contexts for function calls
 
+---
+
+### Example: Two Phases in Action
+
+```javascript
+console.log(x); // undefined (var hoisted)
+console.log(y); // ReferenceError (TDZ)
+
+var x = 10;
+let y = 20;
+
+function greet() {
+  return "Hello";
+}
+console.log(greet()); // "Hello"
 ```
-Line 1: console.log(x)
-→ ReferenceError! (x is in TDZ, uninitialized)
 
-Line 2: let x = 10
-→ x is now initialized with 10
+**Phase 1 - Memory:**
+```javascript
+{
+  x: undefined,
+  y: <uninitialized>, // TDZ
+  greet: function greet() { return "Hello"; }
+}
+```
 
-Line 4: var y = 20
-→ y = 20 (already had undefined, now assigned)
-
-Line 5: console.log(y)
-→ Output: 20
-
-Line 7-9: Function declaration (skip, already processed)
-
-Line 10: console.log(test())
-→ Call test() → Create Function Execution Context
-→ Return "Hello"
-→ Output: "Hello"
+**Phase 2 - Execution:**
+```
+Line 1: console.log(x) → undefined
+Line 2: console.log(y) → ReferenceError (TDZ)
+Line 4: x = 10
+Line 5: y = 20 (TDZ ends)
+Line 7-9: Function already in memory
+Line 10: greet() → Create FEC → Execute → Return "Hello"
 ```
 
 ---
 
 ### Call Stack Visualization
-
-```mermaid
-sequenceDiagram
-    participant CS as Call Stack
-    participant GEC as Global Execution Context
-    participant FEC as Function Execution Context
-    
-    Note over CS: Program Starts
-    CS->>GEC: Create Global EC
-    GEC->>GEC: Phase 1: Memory Creation
-    GEC->>GEC: Phase 2: Code Execution
-    
-    Note over GEC: Encounters greet()
-    GEC->>FEC: Create Function EC for greet()
-    FEC->>FEC: Phase 1: Memory Creation
-    FEC->>FEC: Phase 2: Code Execution
-    FEC-->>GEC: Return & Pop from stack
-    
-    GEC-->>CS: Program Ends
-    Note over CS: Stack Empty
-```
-
----
-
-### Memory Snapshot Example
-
-```javascript
-var a = 10;
-let b = 20;
-const c = 30;
-
-function multiply(x, y) {
-  var result = x * y;
-  return result;
-}
-
-var answer = multiply(5, 6);
-```
-
-**After Memory Creation Phase:**
-```
-Global Execution Context {
-  Memory: {
-    a: undefined
-    b: <uninitialized>
-    c: <uninitialized>
-    multiply: function multiply(x, y) { ... }
-    answer: undefined
-  }
-  Code: (waiting to execute)
-}
-```
-
-**After Code Execution Phase:**
-```
-Global Execution Context {
-  Memory: {
-    a: 10
-    b: 20
-    c: 30
-    multiply: function multiply(x, y) { ... }
-    answer: 30
-  }
-  Code: (fully executed)
-}
-
-Function Execution Context (multiply) - POPPED
-  Arguments: { x: 5, y: 6 }
-  Memory: { result: 30 }
-```
-
----
-
-### Example: How Execution Context Works
 
 ```javascript
 var name = "Global";
@@ -371,7 +201,7 @@ function outer() {
   
   function inner() {
     var name = "Inner";
-    console.log(name); // "Inner" (current scope)
+    console.log(name); // "Inner"
   }
   
   inner();
@@ -381,57 +211,64 @@ function outer() {
 outer();
 console.log(name); // "Global"
 
-// Call Stack visualization:
-// 3. inner() execution context
-// 2. outer() execution context
-// 1. Global execution context
+// Call Stack:
+// 3. inner() EC ← Top
+// 2. outer() EC
+// 1. Global EC ← Bottom
 ```
 
-### Global Execution Context in Detail
-
-```javascript
-// During CREATION phase:
-// 1. Create global object (window/global)
-// 2. Set 'this' to global object
-// 3. Hoist 'greet' function
-// 4. Hoist 'name' variable (initialized as undefined)
-
-console.log(this); // Window (browser) or global (Node.js)
-console.log(name); // undefined (hoisted but not assigned)
-console.log(greet); // [Function: greet] (fully hoisted)
-
-var name = "Alice";
-
-function greet() {
-  console.log("Hello, " + name);
-}
-
-// During EXECUTION phase:
-// 1. Assign "Alice" to name
-// 2. Execute function calls
-greet(); // "Hello, Alice"
+**Stack Flow:**
+```mermaid
+sequenceDiagram
+    participant CS as Call Stack
+    participant GEC as Global EC
+    participant FEC as Function EC
+    
+    CS->>GEC: Create Global EC
+    Note over GEC: Phase 1: Memory<br/>Phase 2: Execute
+    GEC->>FEC: Call function
+    Note over FEC: Phase 1: Memory<br/>Phase 2: Execute
+    FEC-->>GEC: Return & Pop
+    GEC-->>CS: Program Ends
 ```
+
+---
 
 ### Execution Context vs Scope
+
+| Concept | Meaning | Example |
+|---------|---------|---------|
+| **Execution Context** | WHERE code is executed (environment) | Global EC, Function EC |
+| **Scope** | WHICH variables you can ACCESS | Global scope, Function scope, Block scope |
 
 ```javascript
 var x = 10; // Global scope
 
 function test() {
-  var y = 20; // Function scope (local to test)
-  
-  console.log(x); // 10 (accesses global scope)
-  console.log(y); // 20 (accesses local scope)
+  var y = 20; // Function scope
+  console.log(x); // 10 (access global)
+  console.log(y); // 20 (access local)
 }
 
 test();
-console.log(x); // 10
-console.log(y); // ReferenceError: y is not defined (not in global scope)
+console.log(y); // ReferenceError (y not in global scope)
 ```
 
-**Key Difference:**
-- **Execution Context**: WHERE the code is executed (environment)
-- **Scope**: WHICH variables you can ACCESS
+---
+
+### Interview Key Points 🎯
+
+**Q: What happens during execution context creation?**
+- Phase 1: Memory allocation (hoisting)
+- Phase 2: Line-by-line execution
+
+**Q: Difference between GEC and FEC?**
+- GEC: One per program, creates global object, sets `this` to global
+- FEC: One per function call, has arguments, local variables
+
+**Q: Why does `var` return `undefined` when hoisted?**
+- `var` is initialized with `undefined` in Phase 1
+- `let`/`const` are NOT initialized (TDZ starts)
 
 ---
 
