@@ -488,257 +488,113 @@ let x = 10;
 
 ## 4. Event Loop, Call Stack, Task Queue & Microtask Queue
 
-### Understanding JavaScript's Asynchronous Execution Model
+### Understanding JavaScript's Asynchronous Execution
 
-JavaScript is **single-threaded**, meaning it can execute only one piece of code at a time. However, it can handle asynchronous operations thanks to the **Event Loop** mechanism.
+JavaScript is **single-threaded** but handles async operations via the **Event Loop** mechanism.
 
-### Architecture Overview
-
-![Event Loop Architecture](/home/izhar/.gemini/antigravity/brain/619eefa0-7067-48fd-971e-d9ac6950f5be/event_loop_diagram.png)
+![Event Loop Architecture](../image.png)
 
 ---
 
-### 1. Call Stack
+### Core Components
 
-**What is the Call Stack?**
-- A **LIFO (Last In, First Out)** data structure that tracks function execution
-- Keeps track of what function is currently running
-- When a function is called, it's **pushed** onto the stack
-- When a function returns, it's **popped** off the stack
+#### 1. Call Stack
+- **LIFO (Last In, First Out)** structure tracking function execution
+- Functions are **pushed** when called, **popped** when they return
 
-**Example:**
-```javascript
-function first() {
-  console.log("First");
-  second();
-  console.log("First again");
-}
+#### 2. Web APIs
+- Browser-provided APIs handling async operations: `setTimeout`, `fetch`, DOM events, Promises
 
-function second() {
-  console.log("Second");
-}
+#### 3. Task Queue (Macrotask Queue)
+- **FIFO (First In, First Out)** structure  
+- Contains: `setTimeout`, `setInterval`, I/O operations
 
-first();
-
-// Call Stack Execution:
-// 1. Push first() → Execute console.log("First")
-// 2. Push second() → Execute console.log("Second")
-// 3. Pop second() 
-// 4. Continue first() → Execute console.log("First again")
-// 5. Pop first()
-
-// Output:
-// First
-// Second
-// First again
-```
+#### 4. Microtask Queue
+- **Higher priority** than Task Queue
+- Contains: `Promise.then()`, `async/await`, `queueMicrotask()`
 
 ---
 
-### 2. Web APIs
+### Event Loop Flow
 
-**What are Web APIs?**
-- Browser-provided APIs (not part of JavaScript engine)
-- Handle asynchronous operations like:
-  - `setTimeout` / `setInterval`
-  - `fetch` / AJAX
-  - DOM events
-  - `Promise` resolution
-
-When you call `setTimeout`, it's handled by the Web API, **not** the call stack.
-
----
-
-### 3. Task Queue (Macro Task Queue)
-
-**What is the Task Queue?**
-- Also called **Callback Queue** or **Macro Task Queue**
-- Stores callbacks from asynchronous operations
-- **FIFO (First In, First Out)** structure
-
-**What goes into Task Queue:**
-- `setTimeout` callbacks
-- `setInterval` callbacks
-- `setImmediate` (Node.js)
-- I/O operations
-- UI rendering
-
-**Example:**
-```javascript
-console.log("Start");
-
-setTimeout(() => {
-  console.log("Timeout");
-}, 0);
-
-console.log("End");
-
-// Output:
-// Start
-// End
-// Timeout
-
-// Why? Even with 0ms delay, setTimeout callback goes to Task Queue
-// and waits for call stack to be empty
-```
-
----
-
-### 4. Microtask Queue
-
-**What is the Microtask Queue?**
-- A **higher priority** queue than the Task Queue
-- Processed **before** the next Task Queue item
-- All microtasks are executed before any macrotask
-
-**What goes into Microtask Queue:**
-- `Promise.then()` / `Promise.catch()` / `Promise.finally()`
-- `queueMicrotask()`
-- `MutationObserver` callbacks
-- `async/await` continuations
-
-**Example:**
-```javascript
-console.log("Start");
-
-setTimeout(() => {
-  console.log("Timeout");
-}, 0);
-
-Promise.resolve().then(() => {
-  console.log("Promise");
-});
-
-console.log("End");
-
-// Output:
-// Start
-// End
-// Promise
-// Timeout
-
-// Why? Microtask Queue (Promise) has higher priority than Task Queue (setTimeout)
-```
-
----
-
-### Event Loop Execution Flow
+**Step-by-Step Execution:**
+1. Execute **synchronous code** (Call Stack)
+2. When Call Stack is **empty**, execute **ALL microtasks**
+3. Execute **ONE macrotask**
+4. **Repeat** from step 2
 
 ```mermaid
 graph TB
-    Start[Start] --> CallStack{Is Call Stack Empty?}
+    Start[Start] --> CallStack{Call Stack Empty?}
     CallStack -->|No| Execute[Execute Function]
     Execute --> CallStack
     CallStack -->|Yes| MicroCheck{Microtask Queue Empty?}
-    MicroCheck -->|No| ExecMicro[Execute All Microtasks]
+    MicroCheck -->|No| ExecMicro[Execute ALL Microtasks]
     ExecMicro --> MicroCheck
     MicroCheck -->|Yes| TaskCheck{Task Queue Empty?}
-    TaskCheck -->|No| ExecTask[Execute One Macrotask]
+    TaskCheck -->|No| ExecTask[Execute ONE Macrotask]
     ExecTask --> CallStack
-    TaskCheck -->|Yes| End[Wait for New Tasks]
-    End --> CallStack
+    TaskCheck -->|Yes| Wait[Wait for Tasks]
+    Wait --> CallStack
 ```
-
-**Step-by-Step Process:**
-1. **Execute synchronous code** from the call stack
-2. When call stack is **empty**, check **Microtask Queue**
-3. **Execute ALL microtasks** (one by one until queue is empty)
-4. **Render UI** if needed (browser only)
-5. Check **Task Queue**
-6. Execute **ONE macrotask**
-7. **Repeat** from step 2
 
 ---
 
-### Priority: Microtask vs Macrotask
+### Priority Order
 
-**🏆 Priority Order (Highest to Lowest):**
+**🏆 Execution Priority (Highest → Lowest):**
 1. **Synchronous Code** (Call Stack)
-2. **Microtasks** (Promises, queueMicrotask)
+2. **Microtasks** (Promises, async/await)
 3. **Macrotasks** (setTimeout, setInterval)
 
-**Key Rule:**
-> **All microtasks are executed before the next macrotask**
+> **Key Rule:** ALL microtasks execute before the next macrotask
 
 ---
 
-### Comprehensive Example: Promises vs setTimeout
+### Essential Example: Promises vs setTimeout
 
 ```javascript
-console.log("1: Synchronous");
+console.log("1: Sync Start");
 
-setTimeout(() => {
-  console.log("2: setTimeout (Macrotask)");
-}, 0);
+setTimeout(() => console.log("2: Timeout 1"), 0);
 
-Promise.resolve().then(() => {
-  console.log("3: Promise 1 (Microtask)");
-}).then(() => {
-  console.log("4: Promise 2 (Microtask)");
-});
+Promise.resolve()
+  .then(() => console.log("3: Promise 1"))
+  .then(() => console.log("4: Promise 2"));
 
-setTimeout(() => {
-  console.log("5: setTimeout 2 (Macrotask)");
-}, 0);
+setTimeout(() => console.log("5: Timeout 2"), 0);
 
-Promise.resolve().then(() => {
-  console.log("6: Promise 3 (Microtask)");
-});
+Promise.resolve().then(() => console.log("6: Promise 3"));
 
-console.log("7: Synchronous End");
+console.log("7: Sync End");
 
 // Output:
-// 1: Synchronous
-// 7: Synchronous End
-// 3: Promise 1 (Microtask)
-// 4: Promise 2 (Microtask)
-// 6: Promise 3 (Microtask)
-// 2: setTimeout (Macrotask)
-// 5: setTimeout 2 (Macrotask)
+// 1: Sync Start
+// 7: Sync End
+// 3: Promise 1
+// 4: Promise 2
+// 6: Promise 3
+// 2: Timeout 1
+// 5: Timeout 2
+
+// Execution Order: Sync Code → ALL Microtasks → Macrotasks (one at a time)
 ```
-
-**Execution Breakdown:**
-
-| Step | Action | Queue State |
-|------|--------|-------------|
-| 1 | Execute `console.log("1: Synchronous")` | Call Stack: [main] |
-| 2 | `setTimeout` → Task Queue | Task Queue: [setTimeout 1] |
-| 3 | `Promise.resolve().then()` → Microtask Queue | Microtask Queue: [Promise 1] |
-| 4 | `setTimeout` → Task Queue | Task Queue: [setTimeout 1, setTimeout 2] |
-| 5 | `Promise.resolve().then()` → Microtask Queue | Microtask Queue: [Promise 1, Promise 3] |
-| 6 | Execute `console.log("7: Synchronous End")` | Call Stack: [main] |
-| 7 | **Call Stack Empty** → Process Microtasks | Execute all microtasks |
-| 8 | Execute Promise 1 (creates Promise 2) | Microtask Queue: [Promise 3, Promise 2] |
-| 9 | Execute Promise 3 | Microtask Queue: [Promise 2] |
-| 10 | Execute Promise 2 | Microtask Queue: [] |
-| 11 | **Microtasks Empty** → Process Macrotasks | Execute ONE macrotask |
-| 12 | Execute setTimeout 1 | Task Queue: [setTimeout 2] |
-| 13 | **Back to Microtasks** (empty) | Execute next macrotask |
-| 14 | Execute setTimeout 2 | Task Queue: [] |
 
 ---
 
-### Complex Example: Nested Promises and setTimeout
+### Nested Example
 
 ```javascript
 console.log("Start");
 
 setTimeout(() => {
   console.log("Timeout 1");
-  Promise.resolve().then(() => console.log("Promise inside Timeout 1"));
+  Promise.resolve().then(() => console.log("Promise in Timeout"));
 }, 0);
 
 Promise.resolve().then(() => {
   console.log("Promise 1");
-  setTimeout(() => console.log("Timeout inside Promise 1"), 0);
-});
-
-setTimeout(() => {
-  console.log("Timeout 2");
-}, 0);
-
-Promise.resolve().then(() => {
-  console.log("Promise 2");
+  setTimeout(() => console.log("Timeout in Promise"), 0);
 });
 
 console.log("End");
@@ -747,92 +603,39 @@ console.log("End");
 // Start
 // End
 // Promise 1
-// Promise 2
 // Timeout 1
-// Promise inside Timeout 1
-// Timeout 2
-// Timeout inside Promise 1
+// Promise in Timeout  ← Executed immediately after Timeout 1
+// Timeout in Promise
 ```
 
-**Why this order?**
-
-1. **Synchronous**: `Start`, `End`
-2. **Microtasks (Promises)**: `Promise 1`, `Promise 2`
-3. **First Macrotask**: `Timeout 1`
-   - Creates new microtask → `Promise inside Timeout 1` (executed immediately)
-4. **Second Macrotask**: `Timeout 2`
-5. **Third Macrotask**: `Timeout inside Promise 1`
+**Why?**
+- After each macrotask, event loop checks microtask queue again
+- "Promise in Timeout" executes before next macrotask
 
 ---
 
-### Real-World Example: Async/Await
+### Async/Await Behavior
 
 ```javascript
-console.log("1");
-
-async function asyncFunc() {
-  console.log("2");
+async function test() {
+  console.log("1");
   await Promise.resolve();
-  console.log("3"); // This goes to Microtask Queue
+  console.log("2"); // Goes to Microtask Queue
 }
 
-asyncFunc();
+console.log("A");
+test();
+console.log("B");
+setTimeout(() => console.log("C"), 0);
+Promise.resolve().then(() => console.log("D"));
 
-console.log("4");
-
-setTimeout(() => console.log("5"), 0);
-
-Promise.resolve().then(() => console.log("6"));
-
-console.log("7");
-
-// Output:
-// 1
-// 2
-// 4
-// 7
-// 3
-// 6
-// 5
-
-// Explanation:
-// - "await" pauses the function and puts the continuation (console.log("3")) in Microtask Queue
-// - Microtasks (3, 6) execute before macrotasks (5)
+// Output: A, 1, B, 2, D, C
+// Explanation: "await" pauses function, continuation goes to Microtask Queue
 ```
 
 ---
 
-### Microtask Starvation Example
 
-**⚠️ Warning:** Continuously adding microtasks can **starve** macrotasks!
-
-```javascript
-console.log("Start");
-
-setTimeout(() => {
-  console.log("Timeout - This might never run!");
-}, 0);
-
-function addMicrotask() {
-  Promise.resolve().then(() => {
-    console.log("Microtask");
-    addMicrotask(); // Recursively add microtasks
-  });
-}
-
-addMicrotask();
-
-// Output:
-// Start
-// Microtask
-// Microtask
-// Microtask
-// ... (infinite loop, setTimeout never executes!)
-```
-
-**Why?** The event loop keeps executing microtasks and never gets to the macrotask queue!
-
----
 
 ### Event Loop Visual Summary
 
@@ -843,7 +646,7 @@ sequenceDiagram
     participant WebAPI as Web APIs
     participant Micro as Microtask Queue
     participant Macro as Task Queue
-    participant Loop as Event Loop
+    participant EL as Event Loop
     
     Code->>Stack: Execute sync code
     Stack->>WebAPI: setTimeout(fn, 0)
@@ -852,31 +655,31 @@ sequenceDiagram
     Code->>Stack: Promise.resolve().then(fn)
     Stack->>Micro: Add callback to Microtask Queue
     
-    Stack->>Loop: Call stack empty
-    Loop->>Micro: Process ALL microtasks
+    Stack->>EL: Call stack empty
+    EL->>Micro: Process ALL microtasks
     Micro->>Stack: Execute microtask
-    Stack->>Loop: Microtasks done
+    Stack->>EL: Microtasks done
     
-    Loop->>Macro: Process ONE macrotask
+    EL->>Macro: Process ONE macrotask
     Macro->>Stack: Execute macrotask
-    Stack->>Loop: Repeat cycle
+    Stack->>EL: Repeat cycle
 ```
 
 ---
 
-### Quick Reference: Queue Priority
+### Quick Reference
 
-| Queue Type | Priority | Examples | Execution Rule |
-|------------|----------|----------|----------------|
-| **Call Stack** | 🥇 Highest | Synchronous code | Execute immediately |
-| **Microtask Queue** | 🥈 High | Promises, `queueMicrotask`, `async/await` | Execute ALL before next macrotask |
-| **Task Queue** | 🥉 Normal | `setTimeout`, `setInterval`, I/O | Execute ONE per event loop cycle |
+| Queue | Priority | Examples | Rule |
+|-------|----------|----------|------|
+| **Call Stack** | Highest | Sync code | Execute immediately |
+| **Microtask** | High | Promises, async/await | Execute ALL before next macrotask |
+| **Task/Macrotask** | Normal | setTimeout, setInterval | Execute ONE per cycle |
 
 ---
 
 ### Interview Questions
 
-**Q1: What will this code output?**
+**Q1: Output?**
 ```javascript
 console.log("A");
 setTimeout(() => console.log("B"), 0);
@@ -884,23 +687,22 @@ Promise.resolve().then(() => console.log("C"));
 console.log("D");
 
 // Answer: A, D, C, B
-// Explanation: Sync (A, D) → Microtask (C) → Macrotask (B)
+// Why: Sync (A, D) → Microtasks (C) → Macrotasks (B)
 ```
 
-**Q2: Explain the difference between Task Queue and Microtask Queue.**
+**Q2: Why Promise before setTimeout (both 0ms)?**
 ```
 Answer:
-- Task Queue (Macrotask): setTimeout, setInterval, I/O
-- Microtask Queue: Promises, queueMicrotask
-- Priority: ALL microtasks execute before ANY macrotask
-- Event loop processes all microtasks, then ONE macrotask, then repeat
-```
-
-**Q3: Why does Promise execute before setTimeout even with 0ms delay?**
-```
-Answer:
-- setTimeout goes to Task Queue (macrotask)
-- Promise goes to Microtask Queue
+- setTimeout → Task Queue (macrotask)
+- Promise → Microtask Queue
 - Event loop priority: Microtasks > Macrotasks
-- Even with 0ms, setTimeout waits for call stack to be empty AND all microtasks to complete
+- ALL microtasks execute before ANY macrotask
+```
+
+**Q3: What is microtask starvation?**
+```
+Answer:
+- Continuously adding microtasks prevents macrotasks from executing
+- Event loop keeps processing microtasks, never reaches macrotask queue
+- Example: Recursive Promise.resolve().then() can block setTimeout
 ```
