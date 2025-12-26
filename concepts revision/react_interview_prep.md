@@ -335,3 +335,40 @@ useLayoutEffect: Measuring DOM elements, managing animations, or solving layout 
 
 ---
 
+### higher-order components (HOCs)
+Higher order components (HOCs) are functions in React that take a component as an argument and return a new component. The new component typically wraps the original component and adds additional props, state, or behavior. HOCs are a pattern for reusing component logic.
+
+---
+
+### Lazy Loading
+Code splitting is a performance optimization technique that involves breaking down your application's code into smaller, more manageable chunks. This allows the application to load only the necessary code initially and defer the loading of other parts until they are needed. This can significantly reduce the initial load time and improve the overall user experience.
+
+<details>
+<summary>Lazy Loading in react</summary>
+
+```javascript
+import {lazy,Suspense} from 'react';
+const MyComponent = React.lazy(() => import('./MyComponent'));
+
+function App() {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <MyComponent />
+    </React.Suspense>
+  );
+}
+```
+</details>
+
+<details>
+<summary>Lazy Loading in Next.js</summary>
+
+```javascript
+import dynamic from "next/dynamic";
+
+const Chart = dynamic(() => import("./Chart"), {
+  loading: () => <p>Loading...</p>,
+  ssr: false,
+});
+```
+</details>
