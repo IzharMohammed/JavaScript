@@ -53,11 +53,25 @@ useEffect(() => {
 ```
 
 ### C. `useMemo` vs `useCallback`
-- **`useMemo`**: Caches a **calculated value**. Use for expensive calculations.
-- **`useCallback`**: Caches a **function definition**. Use when passing functions to child components (to prevent child re-renders).
+- **`useMemo`**: Caches a **calculated value**. Use for expensive calculations (just for optimizing values).
+- **`useCallback`**: Caches a **function definition**. Use when passing functions to child components (to prevent child re-renders) (just for optimizing functions).
 
 ### D. `useRef`
 Persists values between renders **without causing a re-render**. Also used to access DOM elements directly.
+
+- React.memo prevents unnecessary re-renders of child components when props don’t change. 
+- useMemo is used to cache expensive computed values
+- useCallback is used to memoize function references so they aren’t recreated on every render, especially when passing callbacks to memoized components.
+
+```
+In useCallback If:
+
+You don’t pass it to a memoized child
+
+You don’t use it in a dependency array
+
+👉 There is NO benefit
+```
 
 ---
 
