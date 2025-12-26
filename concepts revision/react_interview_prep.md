@@ -83,31 +83,6 @@ A Higher Order Component (HOC) that skips re-rendering a component if its props 
 
 ---
 
-## 5. Context API Example (Global State)
-```javascript
-const ThemeContext = React.createContext('light');
-
-function App() {
-    return (
-        <ThemeContext.Provider value="dark">
-            <Toolbar />
-        </ThemeContext.Provider>
-    );
-}
-
-function Toolbar() {
-    return <ThemedButton />;
-}
-
-function ThemedButton() {
-    // Consuming the context
-    const theme = React.useContext(ThemeContext);
-    return <button style={{ background: theme === 'dark' ? '#333' : '#fff' }}>I am {theme}</button>;
-}
-```
-
----
-
 ## 6. Advanced Topics
 
 ### `useState` vs `useReducer`
@@ -257,8 +232,92 @@ class ErrorBoundary extends React.Component {
 - Server-side rendering errors
 - Errors in the error boundary itself
 
+--- 
+
+### Controlled vs Uncontrolled Components
+
+- **Controlled:** Form data is handled by React state (`value={state}`, `onChange={setState}`). **Recommended**.
+- **Uncontrolled:** Form data is handled by the DOM (`ref`). Use for file inputs or integrating non-React libs.
+
+Controlled components are React inputs whose value is managed by React state, while uncontrolled components store their value in the DOM and are accessed using refs.
+
 ---
 
-### 🔗 Resources
-- [React Official Docs (New)](https://react.dev/)
-- [Overreacted.io (Dan Abramov's Blog)](https://overreacted.io/)
+## Lifting State Up
+
+Lifting state up in React means moving shared state to the closest common parent component so that multiple child components can access and update it through props. It is necessary to maintain a single source of truth and keep the UI in sync.
+
+### why ??
+
+Because in React:
+- Data flows one-way (parent → child)
+- Sibling components cannot talk directly to each other
+
+So if:
+- Two or more components need the same data
+- Or one component needs to change data used by another
+
+Lift the state up to the nearest common parent.
+
+<details>
+<summary>
+  Solution: Lift state up 
+</summary>
+
+#### Step 1: Move state to parent
+```
+import { useState } from "react";
+
+function Parent() {
+  const [value, setValue] = useState("");
+
+  return (
+    <>
+      <ChildA value={value} onChange={setValue} />
+      <ChildB value={value} />
+    </>
+  );
+}
+```
+
+#### Step 2: Pass data and updater via props
+```
+function ChildA({ value, onChange }) {
+  return (
+    <input
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
+function ChildB({ value }) {
+  return <p>{value}</p>;
+}
+```
+</details>
+
+---
+
+### Rules of Hooks
+
+1. Only call hooks at the top level. Don't call hooks inside loops, conditions, or nested functions.
+2. Only call hooks from React function components and custom hooks. Don't call hooks from regular functions (e.g., plain JavaScript functions, event handlers, or lifecycle methods).
+3. Call hooks in the same order on every render. Don't conditionally call hooks or call hooks inside loops.
+
+## Key differences between useEffect and useLayoutEffect
+
+### Timing
+useEffect: Executes after the browser has painted the UI. \
+useLayoutEffect: Executes before the browser paints, right after DOM changes.
+
+### Blocking behavior
+useEffect: Non-blocking, runs asynchronously. \
+useLayoutEffect: Blocking, runs synchronously.
+
+### Use case examples
+useEffect: Fetching data, updating state, or adding event listeners. \
+useLayoutEffect: Measuring DOM elements, managing animations, or solving layout issues.
+
+---
+
