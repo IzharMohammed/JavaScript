@@ -329,7 +329,7 @@ let x = 10;
 
 JavaScript is **single-threaded** but handles async operations via the **Event Loop** mechanism.
 
-![Event Loop Architecture](../image.png)
+![Event Loop Architecture](../image/image.png)
 
 ---
 

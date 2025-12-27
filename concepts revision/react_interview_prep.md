@@ -508,3 +508,9 @@ Good:
   {new Date().toLocaleTimeString()}
 </p>
 ```
+
+## client side rendering
+![client side rendering](../image/client.png)
+
+## server side rendering
+![server side rendering](../image/server.png)
