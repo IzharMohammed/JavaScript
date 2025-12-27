@@ -543,3 +543,99 @@ Answer:
 - Event loop keeps processing microtasks, never reaches macrotask queue
 - Example: Recursive Promise.resolve().then() can block setTimeout
 ```
+## Additional JavaScript Topics for Interviews
+
+### 1. Closures
+*Explanation*: A closure is a function that captures variables from its surrounding lexical scope, allowing the inner function to access those variables even after the outer function has returned. Commonly used for data privacy and creating function factories.
+```js
+function makeCounter() {
+  let count = 0;
+  return () => ++count;
+}
+const inc = makeCounter();
+console.log(inc()); // 1
+console.log(inc()); // 2
+```
+
+### 2. Prototype & Inheritance
+*Explanation*: JavaScript uses prototype‑based inheritance. Objects inherit properties and methods from a prototype object. Functions can act as constructors, and their `prototype` property defines shared behavior.
+```js
+function Person(name) { this.name = name; }
+Person.prototype.greet = function() { console.log(`Hi, ${this.name}`); };
+const alice = new Person('Alice');
+alice.greet(); // Hi, Alice
+```
+
+### 3. ES6 Modules
+*Explanation*: ES6 introduced native module syntax with `import` and `export`. Modules are singletons, support named and default exports, and enable static analysis for tree‑shaking.
+```js
+// utils.mjs
+export const add = (a, b) => a + b;
+export default function mul(a, b) { return a * b; }
+
+// main.mjs
+import mul, { add } from './utils.mjs';
+console.log(add(2,3)); // 5
+console.log(mul(2,3)); // 6
+```
+
+### 4. Spread / Rest
+*Explanation*: The spread operator expands iterables into individual elements, while the rest parameter collects multiple arguments into an array.
+```js
+const arr = [1,2,3];
+const copy = [...arr]; // shallow copy
+const sum = (...nums) => nums.reduce((a,b) => a+b,0);
+console.log(sum(1,2,3)); // 6
+```
+
+### 5. Deep Event‑Loop Phases
+*Explanation*: The Node.js event loop processes multiple queues in a specific order: timers → pending I/O callbacks → idle/prepare → poll → check → close. `process.nextTick` runs before any other async callbacks, `setImmediate` runs in the check phase.
+- Timers → I/O callbacks → idle, prepare → poll → check → close
+- `setTimeout` → timers queue, `setImmediate` → check queue, `process.nextTick` → runs **before** any other async callbacks.
+
+### 6. Memory Leaks & GC
+*Explanation*: Memory leaks occur when references to objects are unintentionally retained, preventing garbage collection. Common sources are lingering timers, unremoved listeners, and closures that capture large objects. Use `WeakMap`/`WeakSet` to hold non‑essential references.
+- Common leaks: lingering timers, unremoved event listeners, closures holding large objects.
+- Use `WeakMap`/`WeakSet` to avoid retaining references.
+
+### 7. Testing (Jest)
+*Explanation*: Jest is a popular testing framework that provides a simple API for unit tests, assertions, and mocking. Tests are placed in `*.test.js` files and run with `npm test`.
+```js
+// sum.js
+export const sum = (a,b) => a + b;
+
+// sum.test.js
+import { sum } from './sum';
+test('adds two numbers', () => expect(sum(2,3)).toBe(5));
+```
+
+### 8. Security & Edge Cases
+*Explanation*: Interviewers often ask about equality operators, truthy/falsy values, and prototype pollution attacks. Using strict equality (`===`) avoids type‑coercion bugs, and never trusting object prototypes prevents malicious property injection.
+- `==` vs `===`, truthy/falsy pitfalls.
+- Prototype pollution example:
+```js
+const payload = JSON.parse('{"__proto__":{"admin":true}}');
+Object.assign({}, payload);
+console.log({}.admin); // true (polluted)
+```
+
+### 9. Optional Chaining & Nullish Coalescing
+*Explanation*: Optional chaining (`?.`) safely accesses nested properties without throwing, while nullish coalescing (`??`) provides a fallback only when the left side is `null` or `undefined`.
+```js
+const user = { address: { city: 'NY' } };
+console.log(user?.address?.city ?? 'Unknown');
+```
+
+### 10. Async/Await Error Handling
+*Explanation*: Wrap `await` calls in `try/catch` to handle rejected promises. Throwing an error inside async functions propagates as a rejected promise.
+```js
+async function fetchData() {
+  try {
+    const res = await fetch('/api');
+    if (!res.ok) throw new Error('Bad response');
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+  }
+}
+```
