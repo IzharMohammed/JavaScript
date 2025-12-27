@@ -62,15 +62,20 @@ Both use JavaScript, but the **ecosystem** is completely different.
 
 ### Practical Implications
 
-**Browser:**
+<details>
+<summary>Browser-specific APIs Example</summary>
+
 ```javascript
 // Browser-specific APIs
 document.getElementById('btn').addEventListener('click', () => {});
 localStorage.setItem('user', 'Alice');
 fetch('/api/data').then(res => res.json());
 ```
+</details>
 
-**Node.js:**
+<details>
+<summary>Node.js-specific APIs Example</summary>
+
 ```javascript
 // Node.js-specific APIs
 const fs = require('fs');
@@ -79,6 +84,7 @@ fs.readFile('file.txt', 'utf8', (err, data) => {});
 const os = require('os');
 console.log(os.platform()); // 'linux', 'win32', etc.
 ```
+</details>
 
 **Advantage:** Full-stack developers can use **one language** (JavaScript) for both frontend and backend, reducing context switching and leveraging the same skills across the entire stack.
 
@@ -92,6 +98,9 @@ Process data piece by piece instead of loading everything into memory.
 - **Writable**: Write data (file system, HTTP responses)
 - **Duplex**: Both read and write (TCP sockets)
 - **Transform**: Modify data while reading/writing (compression, encryption)
+
+<details>
+<summary>Streams Example</summary>
 
 ```javascript
 const fs = require('fs');
@@ -117,6 +126,7 @@ fs.createReadStream('input.txt')
   .pipe(upperCaseTransform)
   .pipe(fs.createWriteStream('output.txt'));
 ```
+</details>
 
 **Use streams for:**
 - Large files (videos, logs)
@@ -141,7 +151,9 @@ The `fs` module provides APIs for interacting with the file system. Understandin
 
 #### 1. Reading Files
 
-**Synchronous (Blocking):**
+<details>
+<summary>Synchronous (Blocking) Example</summary>
+
 ```javascript
 const fs = require('fs');
 
@@ -153,8 +165,11 @@ try {
   console.error('Error reading file:', err);
 }
 ```
+</details>
 
-**Asynchronous (Callback):**
+<details>
+<summary>Asynchronous (Callback) Example</summary>
+
 ```javascript
 const fs = require('fs');
 
@@ -168,8 +183,11 @@ fs.readFile('file.txt', 'utf8', (err, data) => {
 
 console.log('This runs immediately (non-blocking)');
 ```
+</details>
 
-**Promises (Modern Approach):**
+<details>
+<summary>Promises (Modern Approach) Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 // OR: const fs = require('fs/promises');
@@ -185,12 +203,15 @@ async function readFile() {
 
 readFile();
 ```
+</details>
 
 ---
 
 #### 2. Writing Files
 
-**Write (Overwrites existing file):**
+<details>
+<summary>Write (Overwrites existing file) Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -203,8 +224,11 @@ async function writeFile() {
   }
 }
 ```
+</details>
 
-**Append (Adds to existing file):**
+<details>
+<summary>Append (Adds to existing file) Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -217,8 +241,11 @@ async function appendFile() {
   }
 }
 ```
+</details>
 
-**Synchronous Write (Use sparingly):**
+<details>
+<summary>Synchronous Write Example</summary>
+
 ```javascript
 const fs = require('fs');
 
@@ -228,12 +255,15 @@ try {
   console.error('Error writing file:', err);
 }
 ```
+</details>
 
 ---
 
 #### 3. File Operations
 
-**Check if File Exists:**
+<details>
+<summary>Check if File Exists Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -251,8 +281,11 @@ if (await fileExists('data.txt')) {
   console.log('File exists');
 }
 ```
+</details>
 
-**Delete File:**
+<details>
+<summary>Delete File Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -265,8 +298,11 @@ async function deleteFile(path) {
   }
 }
 ```
+</details>
 
-**Rename/Move File:**
+<details>
+<summary>Rename/Move File Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -279,8 +315,11 @@ async function renameFile() {
   }
 }
 ```
+</details>
 
-**Copy File:**
+<details>
+<summary>Copy File Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -293,8 +332,11 @@ async function copyFile() {
   }
 }
 ```
+</details>
 
-**Get File Stats:**
+<details>
+<summary>Get File Stats Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -314,12 +356,15 @@ async function getFileInfo(path) {
   }
 }
 ```
+</details>
 
 ---
 
 #### 4. Directory Operations
 
-**Read Directory:**
+<details>
+<summary>Read Directory Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -338,8 +383,11 @@ async function listFiles(dirPath) {
   }
 }
 ```
+</details>
 
-**Create Directory:**
+<details>
+<summary>Create Directory Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -356,8 +404,11 @@ async function createDir(path) {
 // Example: Creates all parent directories
 await createDir('logs/2024/december');
 ```
+</details>
 
-**Remove Directory:**
+<details>
+<summary>Remove Directory Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -371,12 +422,15 @@ async function removeDir(path) {
   }
 }
 ```
+</details>
 
 ---
 
 #### 5. Working with JSON Files
 
-**Read JSON:**
+<details>
+<summary>Read JSON Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -393,8 +447,11 @@ async function readJSON(path) {
 // Usage
 const config = await readJSON('config.json');
 ```
+</details>
 
-**Write JSON:**
+<details>
+<summary>Write JSON Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 
@@ -411,12 +468,15 @@ async function writeJSON(path, data) {
 // Usage
 await writeJSON('users.json', { name: 'Alice', age: 25 });
 ```
+</details>
 
 ---
 
 #### 6. File Streaming (For Large Files)
 
-**Read Stream:**
+<details>
+<summary>Read Stream Example</summary>
+
 ```javascript
 const fs = require('fs');
 
@@ -437,8 +497,11 @@ readStream.on('error', (err) => {
   console.error('Error reading stream:', err);
 });
 ```
+</details>
 
-**Write Stream:**
+<details>
+<summary>Write Stream Example</summary>
+
 ```javascript
 const fs = require('fs');
 
@@ -454,8 +517,11 @@ writeStream.on('finish', () => {
   console.log('Finished writing file');
 });
 ```
+</details>
 
-**Copy Large File (Stream):**
+<details>
+<summary>Copy Large File (Stream) Example</summary>
+
 ```javascript
 const fs = require('fs');
 
@@ -468,6 +534,7 @@ writeStream.on('finish', () => {
   console.log('File copied successfully');
 });
 ```
+</details>
 
 ---
 
@@ -487,7 +554,9 @@ writeStream.on('finish', () => {
 - Ignore error handling
 - Hardcode file paths (use `path` module)
 
-**Example: Production-Ready File Read**
+<details>
+<summary>Production-Ready File Read Example</summary>
+
 ```javascript
 const fs = require('fs').promises;
 const path = require('path');
@@ -510,6 +579,7 @@ async function readUserData(userId) {
   }
 }
 ```
+</details>
 
 ---
 
@@ -530,6 +600,10 @@ async function readUserData(userId) {
 - Use streams for large uploads
 
 **Q4: How to read file line by line?**
+
+<details>
+<summary>Read File Line by Line Example</summary>
+
 ```javascript
 const fs = require('fs');
 const readline = require('readline');
@@ -544,11 +618,15 @@ for await (const line of rl) {
   console.log(line);
 }
 ```
+</details>
 
 ---
 
 ### Clustering
 Utilize all CPU cores by creating worker processes.
+
+<details>
+<summary>Clustering Example</summary>
 
 ```javascript
 const cluster = require('cluster');
@@ -577,6 +655,7 @@ if (cluster.isMaster) {
   console.log(`Worker ${process.pid} started`);
 }
 ```
+</details>
 
 **Benefits:**
 - Maximizes CPU utilization
@@ -587,6 +666,9 @@ if (cluster.isMaster) {
 
 ### WebSockets
 Full-duplex communication for real-time applications.
+
+<details>
+<summary>WebSockets Example</summary>
 
 ```javascript
 // Server (using ws library)
@@ -614,6 +696,7 @@ const socket = new WebSocket('ws://localhost:8080');
 socket.onopen = () => socket.send('Hello!');
 socket.onmessage = (event) => console.log('Received:', event.data);
 ```
+</details>
 
 **Use cases:**
 - Chat applications
@@ -626,6 +709,9 @@ socket.onmessage = (event) => console.log('Received:', event.data);
 
 ### File Uploads (Multer)
 Secure file upload handling.
+
+<details>
+<summary>File Uploads (Multer) Example</summary>
 
 ```javascript
 const multer = require('multer');
@@ -684,6 +770,7 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: error.message });
 });
 ```
+</details>
 
 **Security Best Practices:**
 - Validate file type (check MIME type AND extension)
@@ -704,7 +791,9 @@ The `readline` module provides an interface for reading data from a Readable str
 - CLI tools (npm init, create-react-app prompts)
 - REPL (Read-Eval-Print Loop) implementations
 
-**Basic Example:**
+<details>
+<summary>Basic Example</summary>
+
 ```javascript
 const readline = require('readline');
 
@@ -718,8 +807,11 @@ rl.question('What is your name? ', (name) => {
   rl.close(); // Always close when done
 });
 ```
+</details>
 
-**Interactive Loop Example:**
+<details>
+<summary>Interactive Loop Example</summary>
+
 ```javascript
 const readline = require('readline');
 
@@ -751,8 +843,11 @@ rl.on('close', () => {
   process.exit(0);
 });
 ```
+</details>
 
-**Async/Await Pattern (Modern Approach):**
+<details>
+<summary>Async/Await Pattern (Modern Approach)</summary>
+
 ```javascript
 const readline = require('readline');
 
@@ -776,6 +871,7 @@ async function main() {
 
 main();
 ```
+</details>
 
 **Key Points:**
 - Always call `rl.close()` when finished to prevent process hanging
@@ -806,7 +902,9 @@ WebAssembly is a **binary instruction format** that runs at near-native speed in
 
 ### Node.js with WebAssembly
 
-**Example: Using WASM in Node.js**
+<details>
+<summary>Using WASM in Node.js Example</summary>
+
 ```javascript
 const fs = require('fs');
 
@@ -832,8 +930,11 @@ async function loadWasm() {
 const wasm = await loadWasm();
 console.log(wasm.fibonacci(10)); // Fast execution
 ```
+</details>
 
-**Creating WASM (Rust Example):**
+<details>
+<summary>Creating WASM (Rust Example)</summary>
+
 ```rust
 // lib.rs
 #[no_mangle]
@@ -844,6 +945,7 @@ pub extern "C" fn add(a: i32, b: i32) -> i32 {
 // Compile to WASM
 // cargo build --target wasm32-unknown-unknown --release
 ```
+</details>
 
 **Real-World Use Cases:**
 1. **Cryptography**: Fast encryption/hashing (bcrypt, argon2)
@@ -858,7 +960,9 @@ pub extern "C" fn add(a: i32, b: i32) -> i32 {
 - **ImageMagick WASM**: Image manipulation
 - **FFmpeg WASM**: Video processing
 
-**Performance Comparison:**
+<details>
+<summary>Performance Comparison</summary>
+
 ```javascript
 // JavaScript (slower for heavy computation)
 function fibonacci(n) {
@@ -868,14 +972,9 @@ function fibonacci(n) {
 
 // WASM version is 10-100x faster for large n
 ```
+</details>
 
 **Key Takeaway:**
 - Use **JavaScript** for business logic, I/O, async operations
 - Use **WebAssembly** for CPU-intensive calculations
 - Together, they create high-performance Node.js applications
-
----
-
-### 🔗 Resources
-- [Node.js Event Loop (Official Docs)](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
-- [Don't Block the Event Loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)
