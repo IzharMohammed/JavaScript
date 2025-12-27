@@ -50,6 +50,16 @@
 5. `path` – file‑path utilities.
 
 ### Role of the `fs` Module (examples)
+
+used for performing file operations
+- fs.readFile() - reads the contents of file specified
+- fs.writeFile() - writes data to specific file, creating the file if it doesnt exist
+- fs.appendFile() - appends data to specific file,creating the file if it doesnt exist
+- fs.unlink()     - deletes the specified file
+- fs.mkdir()      - creates a new directory
+- fs.rmdir()     - removes specific directory
+- fs.readdir()   - reads the contents of directory
+
 ```javascript
 const fs = require('fs').promises;
 
