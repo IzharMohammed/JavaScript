@@ -68,6 +68,55 @@ async function appendFile(path, data) {
   await fs.appendFile(path, data, 'utf8');
 }
 ```
+<details>
+<summary>Synchronous (Blocking) Example</summary>
+
+```javascript
+const fs = require('fs');
+
+try {
+  const data = fs.readFileSync('file.txt', 'utf8');
+  console.log(data);
+} catch (err) {
+  console.error('Error reading file:', err);
+}
+```
+</details>
+
+<details>
+<summary>Asynchronous (Callback) Example</summary>
+
+```javascript
+const fs = require('fs');
+
+fs.readFile('file.txt', 'utf8', (err, data) => {
+  if (err) {
+    console.error('Error reading file:', err);
+    return;
+  }
+  console.log(data);
+});
+```
+</details>
+
+<details>
+<summary>Promise (fs/promises) Example</summary>
+
+```javascript
+const fs = require('fs').promises;
+
+async function readFile() {
+  try {
+    const data = await fs.readFile('file.txt', 'utf8');
+    console.log(data);
+  } catch (err) {
+    console.error('Error reading file:', err);
+  }
+}
+readFile();
+```
+</details>
+
 
 <details>
 <summary>Path Module Utilities</summary>
@@ -122,6 +171,21 @@ folder/students/data.txt
 ## 7. Quick Reference
 - **Run a script**: `node script.js`
 - **Install a package**: `npm install <package>`
+
+### Dependency vs Dev Dependency
+
+Dependencies (`dependencies`):
+- Packages required at runtime.
+- Installed when the app runs (`npm install` in production).
+- Listed under "dependencies" in package.json.
+
+Dev Dependencies (`devDependencies`):
+- Packages needed only during development/build (e.g., testing frameworks, linters, bundlers).
+- Not installed in production when using `npm install --production` or `NODE_ENV=production`.
+- Listed under "devDependencies" in package.json.
+
+---
+
 - **Start a server** (Express example):
 ```javascript
 const express = require('express');
