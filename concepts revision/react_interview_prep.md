@@ -372,3 +372,139 @@ const Chart = dynamic(() => import("./Chart"), {
 });
 ```
 </details>
+
+---
+
+### Suspense and fallback
+
+Suspense is a React component that lets you show a temporary UI while something is loading.  \
+That “something” can be:
+- Lazy-loaded components
+- Data (in modern React / Next.js)
+- Server Components streaming
+
+fallback is the UI shown while React is waiting for the component or data to load.
+
+<details>
+<summary>Lazy Loading in react</summary>
+
+```javascript
+import { lazy, Suspense } from "react";
+
+const Profile = lazy(() => import("./Profile"));
+
+function App() {
+  return (
+    <Suspense fallback={<p>Loading profile...</p>}>
+      <Profile />
+    </Suspense>
+  );
+}
+```
+</details>
+
+<details>
+<summary>Suspense in Next.js</summary>
+
+```javascript
+import { Suspense } from "react";
+
+export default function Page() {
+  return (
+    <Suspense fallback={<p>Loading data...</p>}>
+      <Posts />
+    </Suspense>
+  );
+}
+```
+</details>
+
+---
+
+##  What is Hydration?
+
+**Hydration** is the process where React **attaches JavaScript behavior** (event listeners, state) to **HTML already rendered on the server**.
+
+In simple words:
+- Server sends ready HTML
+- Browser shows it instantly
+- React makes it interactive
+
+Hydration happens **after SSR (Server-Side Rendering)**.
+
+---
+
+## Why does Hydration occur?
+
+Hydration occurs because of **Server-Side Rendering (SSR)**.
+
+Without hydration:
+- Page looks correct
+- Buttons don’t work
+- No interactivity
+
+With hydration:
+- Clicks work
+- State works
+- App becomes interactive
+
+SSR = Fast first load  
+Hydration = Interactivity
+
+---
+
+## Hydration Flow (Step-by-Step)
+
+```text
+1. Server renders HTML (SSR)
+2. Browser displays HTML immediately
+3. JavaScript bundle downloads
+4. React hydrates the HTML
+5. App becomes interactive
+```
+## Hydration mismatch
+When server-rendered HTML ≠ client-rendered HTML
+
+### Common Causes
+- Using browser-only APIs during SSR              (window.innerWidth, document.title, localStorage)
+- Non-deterministic values                        (e.g., timestamps, random numbers)
+- Conditional rendering based on client-only data (if (typeof window !== "undefined") { ... })
+
+### How to prevent hydration issues 
+1. Use Client Components when needed
+```
+"use client";
+```
+2. Run browser-only code inside useEffect
+```
+useEffect(() => {
+  setWidth(window.innerWidth);
+}, []);
+```
+
+3. Disable SSR for specific components (Next.js)
+```
+import dynamic from "next/dynamic";
+
+const Chart = dynamic(() => import("./Chart"), {
+  ssr: false
+});
+```
+
+4. Use deterministic rendering on server
+```
+Bad:
+
+<p>{Math.random()}</p>
+
+Good:
+
+<p>{valueFromServer}</p>
+```
+
+5. Use suppressHydrationWarning (last resort)
+```
+<p suppressHydrationWarning>
+  {new Date().toLocaleTimeString()}
+</p>
+```
