@@ -69,25 +69,49 @@ async function appendFile(path, data) {
 }
 ```
 
-### Path Module Utilities
+<details>
+<summary>Path Module Utilities</summary>
+
 ```javascript
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-// Join segments
-const fullPath = path.join('/docs', 'file.txt'); // /docs/file.txt
+console.log(__dirname);
+console.log(__filename);
 
-// Parse a path
-const parsed = path.parse('/docs/file.txt');
-/*
-{ root: '/', dir: '/docs', base: 'file.txt', ext: '.txt', name: 'file' }
-*/
+const filePath = path.join("folder", "students", "data.txt");
+console.log(filePath);
 
-// Resolve to absolute path
-const absolute = path.resolve('src', '../index.js');
+const parsedData = path.parse(filePath);
+const resolvedPath = path.resolve(filePath);
+const extName = path.extname(filePath);
+const baseName = path.basename(filePath);
+const dirName = path.dirname(filePath);
 
-// Get extension
-const ext = path.extname('archive.tar.gz'); // .gz
+console.log({ parsedData, resolvedPath, extName, baseName, dirName });
+
+/**
+ * o/p:-
+ * /home/izhar/learnings/node/path
+/home/izhar/learnings/node/path/index.js
+folder/students/data.txt
+{
+  parsedData: {
+    root: '',
+    dir: 'folder/students',
+    base: 'data.txt',
+    ext: '.txt',
+    name: 'data'
+  },
+  resolvedPath: '/home/izhar/learnings/node/folder/students/data.txt',
+  extName: '.txt',
+  baseName: 'data.txt',
+  dirName: 'folder/students'
+}
+ * 
+ */
 ```
+</details>
 
 ### Special Node.js Constants
 - `__filename` – absolute path of the current file.
