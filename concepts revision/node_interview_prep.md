@@ -213,3 +213,200 @@ if (cluster.isMaster) {
   // worker code here
 }
 ```
+
+### Readline Module (Interactive CLI)
+The `readline` module provides an interface for reading data from a Readable stream (like `process.stdin`) one line at a time.
+
+**Use Cases:**
+- Interactive command-line applications
+- User input prompts
+- CLI tools (npm init, create-react-app prompts)
+- REPL (Read-Eval-Print Loop) implementations
+
+<details>
+<summary>Basic Example</summary>
+
+```javascript
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,   // Read from terminal input
+  output: process.stdout  // Write to terminal output
+});
+
+rl.question('What is your name? ', (name) => {
+  console.log(`Hello, ${name}!`);
+  rl.close(); // Always close when done
+});
+```
+</details>
+
+<details>
+<summary>Interactive Loop Example</summary>
+
+```javascript
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+function askName() {
+  rl.question("What is your name? (type 'bye' to exit): ", (name) => {
+    // Check if user wants to exit
+    if (name.toLowerCase() === 'bye') {
+      console.log("Goodbye! 👋");
+      rl.close(); // Close the readline interface
+      return;
+    }
+    
+    console.log(`Hello ${name}!\n`);
+    askName(); // Recursive call for continuous input
+  });
+}
+
+// Start the conversation
+askName();
+
+// Handle close event
+rl.on('close', () => {
+  console.log('Interface closed');
+  process.exit(0);
+});
+```
+</details>
+
+<details>
+<summary>Async/Await Pattern (Modern Approach)</summary>
+
+```javascript
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+// Promisify the question method
+function askQuestion(query) {
+  return new Promise(resolve => rl.question(query, resolve));
+}
+
+async function main() {
+  const name = await askQuestion('What is your name? ');
+  const age = await askQuestion('What is your age? ');
+  
+  console.log(`Hello ${name}, you are ${age} years old!`);
+  rl.close();
+}
+
+main();
+```
+</details>
+
+**Key Points:**
+- Always call `rl.close()` when finished to prevent process hanging
+- Use `process.stdin` for terminal input, `process.stdout` for output
+- For complex CLI apps, consider libraries like `inquirer` or `prompts`
+
+---
+
+### WebAssembly (WASM)
+WebAssembly is a **binary instruction format** that runs at near-native speed in browsers and Node.js.
+
+**What is WebAssembly?**
+- Low-level assembly-like language
+- Compiled from languages like C, C++, Rust, Go
+- Runs in a sandboxed environment alongside JavaScript
+- **Not a replacement** for JavaScript, but a complement
+
+**Why Use WebAssembly?**
+- **Performance**: CPU-intensive tasks run **much faster** than JavaScript
+- **Language Flexibility**: Use C/C++/Rust libraries in JavaScript
+- **Portability**: Same binary runs in browser and Node.js
+
+**Browser vs Node.js:**
+| Feature | Browser | Node.js |
+|---------|---------|---------|
+| **Use Case** | Games, video editing, image processing | Crypto, data processing, ML inference |
+| **Loading** | `fetch()` + `WebAssembly.instantiate()` | `fs.readFileSync()` + compile |
+
+### Node.js with WebAssembly
+
+<details>
+<summary>Using WASM in Node.js Example</summary>
+
+```javascript
+const fs = require('fs');
+
+// Load WASM binary
+const wasmBuffer = fs.readFileSync('./module.wasm');
+
+// Compile and instantiate
+WebAssembly.instantiate(wasmBuffer).then(result => {
+  const { add, multiply } = result.instance.exports;
+  
+  console.log(add(5, 3));      // 8
+  console.log(multiply(4, 7)); // 28
+});
+
+// Async/Await version
+async function loadWasm() {
+  const wasmBuffer = fs.readFileSync('./module.wasm');
+  const { instance } = await WebAssembly.instantiate(wasmBuffer);
+  
+  return instance.exports;
+}
+
+const wasm = await loadWasm();
+console.log(wasm.fibonacci(10)); // Fast execution
+```
+</details>
+
+<details>
+<summary>Creating WASM (Rust Example)</summary>
+
+```rust
+// lib.rs
+#[no_mangle]
+pub extern "C" fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+// Compile to WASM
+// cargo build --target wasm32-unknown-unknown --release
+```
+</details>
+
+**Real-World Use Cases:**
+1. **Cryptography**: Fast encryption/hashing (bcrypt, argon2)
+2. **Image Processing**: Resize, compress, filters (Sharp library uses WASM)
+3. **Data Processing**: Large dataset transformations
+4. **Machine Learning**: TensorFlow.js uses WASM backend
+5. **Game Servers**: Physics calculations
+
+**Popular WASM Tools for Node.js:**
+- **esbuild**: Super-fast JavaScript bundler (written in Go, compiled to WASM)
+- **SQLite WASM**: Run SQLite in Node.js
+- **ImageMagick WASM**: Image manipulation
+- **FFmpeg WASM**: Video processing
+
+<details>
+<summary>Performance Comparison</summary>
+
+```javascript
+// JavaScript (slower for heavy computation)
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// WASM version is 10-100x faster for large n
+```
+</details>
+
+**Key Takeaway:**
+- Use **JavaScript** for business logic, I/O, async operations
+- Use **WebAssembly** for CPU-intensive calculations
+- Together, they create high-performance Node.js applications
