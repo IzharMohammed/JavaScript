@@ -296,3 +296,193 @@ EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'test@example.com';
 -- Shows execution plan and performance metrics
 ```
 
+# Database Interview Questions and Answers
+
+---
+
+## Question 1: Difference between JOINs
+
+**INNER JOIN:** Returns only matching rows from both tables.
+
+```sql
+SELECT Users.name, Orders.id
+FROM Users
+INNER JOIN Orders ON Users.id = Orders.user_id;
+```
+
+**LEFT JOIN:** Returns all rows from left table + matching rows from right table.
+
+```sql
+SELECT Users.name, Orders.id
+FROM Users
+LEFT JOIN Orders ON Users.id = Orders.user_id;
+```
+
+**RIGHT JOIN:** Returns all rows from right table + matching rows from left table.
+
+```sql
+SELECT Users.name, Orders.id
+FROM Users
+RIGHT JOIN Orders ON Users.id = Orders.user_id;
+```
+
+**FULL OUTER JOIN:** Returns all rows from both tables, with NULLs if no match.
+
+```sql
+SELECT Users.name, Orders.id
+FROM Users
+FULL OUTER JOIN Orders ON Users.id = Orders.user_id;
+```
+
+---
+
+## Question 2: Keys
+
+* **Primary Key:** Unique identifier for a row. Cannot be NULL.
+* **Foreign Key:** References a primary key in another table.
+* **Unique Key:** Ensures column values are unique but can be NULL.
+
+```sql
+CREATE TABLE Users (
+    id INT PRIMARY KEY,
+    email VARCHAR(50) UNIQUE
+);
+
+CREATE TABLE Orders (
+    id INT PRIMARY KEY,
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+```
+
+---
+
+## Question 3: Normalization
+
+**1NF:** Atomic values, no repeating groups.
+**2NF:** 1NF + all non-key columns fully depend on primary key.
+**3NF:** 2NF + no transitive dependency.
+
+Example: Users table with `id, name, address, city` → normalized by separating address table.
+
+---
+
+## Question 4: Index
+
+**Index:** Data structure to speed up queries.
+
+* Use for columns frequently used in `WHERE`, `JOIN`, `ORDER BY`.
+* Drawbacks: slower `INSERT/UPDATE/DELETE` and uses extra memory.
+
+```sql
+CREATE INDEX idx_user_email ON Users(email);
+```
+
+---
+
+## Question 5: SQL vs NoSQL
+
+* **SQL:** Structured, relational, uses tables, schema enforced.
+* **NoSQL:** Unstructured, flexible schema, document/key-value/graph.
+* **Use MongoDB:** Dynamic schema, hierarchical JSON-like documents, fast prototyping.
+
+---
+
+## Question 6: MongoDB findOne() vs find()
+
+* **findOne():** Returns single document.
+* **find():** Returns cursor with multiple documents.
+
+```js
+// findOne
+db.users.findOne({email: "test@example.com"});
+
+// find
+db.users.find({active: true});
+```
+
+---
+
+## Question 7: Transactions & ACID
+
+**Transaction:** Group of operations executed as one unit.
+
+**ACID:**
+
+* **Atomicity:** All or nothing.
+* **Consistency:** DB remains valid.
+* **Isolation:** Parallel transactions do not interfere.
+* **Durability:** Changes persist after commit.
+
+```sql
+BEGIN;
+UPDATE Accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE Accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+```
+
+---
+
+## Question 8: Query Optimization
+
+* Create indexes on frequently searched columns.
+* Avoid `SELECT *`, fetch only needed columns.
+* Use joins wisely, avoid nested queries if possible.
+* Analyze query with `EXPLAIN`.
+
+```sql
+EXPLAIN SELECT * FROM Orders WHERE user_id = 5;
+```
+
+---
+
+## Question 9: Total Orders per User
+
+**SQL:**
+
+```sql
+SELECT Users.id, Users.name, COUNT(Orders.id) AS total_orders
+FROM Users
+LEFT JOIN Orders ON Users.id = Orders.user_id
+GROUP BY Users.id, Users.name;
+```
+
+**MongoDB:**
+
+```js
+db.orders.aggregate([
+  { $group: { _id: "$user_id", total_orders: { $sum: 1 } } }
+]);
+```
+
+---
+
+## Question 10: Database Design (E-commerce)
+
+**Relational (SQL):**
+
+```sql
+Users(id PK, name, email)
+Products(id PK, name, price)
+Orders(id PK, user_id FK, total)
+OrderItems(id PK, order_id FK, product_id FK, quantity)
+```
+
+**Document (MongoDB):**
+
+```json
+{
+  "_id": 1,
+  "name": "John",
+  "orders": [
+    {"order_id": 101, "products": [{"id": 1, "qty": 2}]}
+  ]
+}
+```
+
+* SQL: Good for transactional consistency, normalized data.
+* MongoDB: Good for hierarchical, flexible, nested data, faster reads for aggregated documents.
+
+---
+
+**End of Document**
